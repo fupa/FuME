@@ -1,8 +1,8 @@
 <img src="bin/header.png" alt="FuME FuPa Match Explorer" width="400">
 
-[![Requirements Status](https://requires.io/github/ndrsfldl/FuME/requirements.svg?branch=master)](https://requires.io/github/ndrsfldl/FuME/requirements/?branch=master)
-[![Github All Releases](https://img.shields.io/github/downloads/ndrsfldl/fume/total.svg)](https://github.com/ndrsfldl/FuME/releases)
-[![GitHub release](https://img.shields.io/github/release/ndrsfldl/fume.svg)](https://github.com/ndrsfldl/FuME/releases/latest)
+[![Requirements Status](https://requires.io/github/fupadev/FuME/requirements.svg?branch=master)](https://requires.io/github/fupadev/FuME/requirements/?branch=master)
+[![Github All Releases](https://img.shields.io/github/downloads/fupadev/fume/total.svg)](https://github.com/fupadev/FuME/releases)
+[![GitHub release](https://img.shields.io/github/release/fupadev/fume.svg)](https://github.com/fupadev/FuME/releases/latest)
 
 # Was ist FuME?
 :us: _Short description in english:_ FuME is the one and only Match Explorer for the German amateur soccer platform [FuPa.net](https://www.fupa.net/index.php?page=kalender) written in pythons qt module pyqt5 published under LGPLv3 license using requests for public website information and selenium for [Vereinsverwaltung](https://www.fupa.net/fupa/admin/index.php) (password required).
@@ -26,14 +26,14 @@ Jeder :tada:. Das Projekt ist Open Source und steht allen kostenlos zur Verfügu
 Aktuell in Version 1.0 (02.07.2017) [(aktuelle Änderungen)](CHANGELOG.md)
 
 ### Windows
-- [FuME Zip-Datei für Windows von hier downloaden](https://github.com/ndrsfldl/FuME/releases/download/v1.0/FuME_Windows.zip)
+- [FuME Zip-Datei für Windows von hier downloaden](https://github.com/fupadev/FuME/releases/download/v1.0/FuME_Windows.zip)
 - FuME_Windows.zip an gewünschtem Ort entpacken
 - FuME.exe starten
 
 **Anmerkung:** Windows 7 oder höher wird empfohlen.
 
 ### macOS
-- [FuME Zip-Datei für macOS von hier downloaden](https://github.com/ndrsfldl/FuME/releases/download/v1.0/FuME_macOS.zip)
+- [FuME Zip-Datei für macOS von hier downloaden](https://github.com/fupadev/FuME/releases/download/v1.0/FuME_macOS.zip)
 - FuME_macOS.zip an gewünschtem Ort entpacken
 - Rechtsklick auf FuME.app -> öffnen
 - klicke _öffnen_ falls eine Sicherheitswarnung erscheint
@@ -47,7 +47,7 @@ Wähle zuerst deine Region im Dropdown-Menü _(1)_. Beschränke dann den Zeitrau
 und **importiert** werden sollen _(2)_. Neue Spiele fügst du nun mit dem Knopf "importieren" _(3)_ der Übersicht hinzu _(4)_. Im Anschluss fügst du deine Vereine, die du fotografierst, über Auswahl "konfigurieren" _(5)_ deiner Vereinsliste _(7)_ hinzu. Im Dialog "Filter bearbeiten" _(6)_ markierst du deine Vereine. Nach einem Klick auf "Ok" kannst du Spiele nach Mannschaft _(7)_, Datum _(2)_ und Region _(1)_ filtern.
 
 Für alle Funktionen, die Zugang zur [Vereinsverwaltung](https://www.fupa.net/fupa/admin/index.php) benötigen 
-(z.B. Spiele reservieren _(9)_) wird der Browser **[Google Chrome](https://www.google.com/chrome/browser/desktop/index.html)** benötigt. Mit diesem muss ein Cookie in den "Einstellungen" _(8)_ von FuME angelegen. Der Cookie sorgt dafür, dass du dich nicht jedes Mal einloggen musst, um Spiele reservieren _(9)_ zu können. FuME speichert keine Passwörter, wir achten auf Datenschutz.
+(z.B. Spiele reservieren _(9)_) wird der Browser **[Google Chrome](https://www.google.com/chrome/browser/desktop/index.html)** benötigt. Mit diesem muss ein Cookie in den "Einstellungen" _(8)_ von FuME angelegt werden. Der Cookie sorgt dafür, dass du dich nicht jedes Mal einloggen musst, um Spiele reservieren _(9)_ zu können. FuME speichert keine Passwörter, wir achten auf Datenschutz.
 
 ## Q&A
  > Warum finde ich meinen Verein unter Auswahl->konfigurieren _(5/6)_ nicht oder warum wird nur die I. Mannschaft angezeigt?
@@ -64,7 +64,7 @@ Für alle Funktionen, die Zugang zur [Vereinsverwaltung](https://www.fupa.net/fu
  - [x] Windows Exe
 
 ## Bugs / Kontakt
-FuME ist Open Source und wurde von Andreas Feldl erstellt. Fehler, Bugs oder Wünsche bitte unter [Issues](https://github.com/ndrsfldl/FuME/issues) melden. 
+FuME ist Open Source und wurde von Andreas Feldl erstellt. Fehler, Bugs oder Wünsche bitte unter [Issues](https://github.com/fupadev/FuME/issues) melden. 
 Bei Fragen oder Probleme eine Mail an <fume@afeldl.de>
 
 ## Lizenz / Credit
