@@ -34,9 +34,18 @@ Aktuell in Version 1.0 (02.07.2017) [(aktuelle Änderungen)](CHANGELOG.md)
 
 ### macOS
 - [FuME Zip-Datei für macOS von hier downloaden](https://github.com/fupadev/FuME/releases/download/v1.0/FuME_macOS.zip)
-- FuME_macOS.zip an gewünschtem Ort entpacken
-- Rechtsklick auf FuME.app -> öffnen
-- klicke _öffnen_ falls eine Sicherheitswarnung erscheint
+- FuME_macOS.zip an gewünschtem Ort entpacken (z.B. unter Programme)
+- den Terminal unter Programme/Dienstprogramme/Terminal.app öffnen
+- folgenden Befehl zum ausschalten des Gatekeepers ausführen
+```bash
+sudo spctl --master-disable
+```
+- Administratorpasswort eingeben und mit Return bestätigen
+- rechtsklick auf FuME.app -> öffnen
+- über folgenden Befehl Gatekeeper erneut starten
+```bash
+sudo spctl --master-enable
+```
 
 **Anmerkung:** nur unter macOS Version 10.12 (Sierra) getestet. Ältere Versionen werden nicht zwingend unterstüzt.
 
@@ -60,7 +69,7 @@ Für alle Funktionen, die Zugang zur [Vereinsverwaltung](https://www.fupa.net/fu
 
 ## Todos
  - [ ] Reservierungsübersicht
- - [x] MacOS App
+ - [ ] MacOS App Code Signing
  - [x] Windows Exe
 
 ## Bugs / Kontakt
