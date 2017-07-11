@@ -41,7 +41,7 @@ Aktuell in Version 1.0 (02.07.2017) [(aktuelle Änderungen)](CHANGELOG.md)
 sudo spctl --master-disable
 ```
 - Administratorpasswort eingeben und mit Return bestätigen
-- rechtsklick auf FuME.app -> öffnen
+- rechtsklick auf FuME.app -> öffnen und Warnmeldung bestätigen
 - über folgenden Befehl Gatekeeper erneut starten
 ```bash
 sudo spctl --master-enable
