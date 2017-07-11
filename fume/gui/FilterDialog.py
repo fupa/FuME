@@ -26,11 +26,12 @@ class FilterDialog(QtWidgets.QDialog, Ui_filter):
         self.listmodel = QtSql.QSqlQueryModel()
         self.listmodel.setQuery("""
         select home from calendar
-        UNION ALL
+        WHERE region = "%s"
+        UNION
         select home from team_default
         WHERE region = "%s"
         Order By home ASC
-        """ % self.region, self.parent().db)
+        """ % (self.region,self.region), self.parent().db)
 
         # Fetching all teams from db
         # adapted: http://stackoverflow.com/a/27393939/6304901
