@@ -101,13 +101,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def set_connections(self):
         # Push Buttons
-        #self.pushButton.clicked.connect(self.showFilterDialog)
-        #self.pushButton_2.clicked.connect(self.invertSelection)
+        # self.pushButton.clicked.connect(self.showFilterDialog)
+        # self.pushButton_2.clicked.connect(self.invertSelection)
         self.pushButton_3.clicked.connect(self.logDialog.show)
         self.pushButton_4.clicked.connect(self.settingsDialog.show)
         self.pushButton_5.clicked.connect(self.download_match)
-        #self.pushButton_9.clicked.connect(self.listWidget.selectionModel().clearSelection)
-        #self.pushButton_10.clicked.connect(self.restoreSelection)
+        # self.pushButton_9.clicked.connect(self.listWidget.selectionModel().clearSelection)
+        # self.pushButton_10.clicked.connect(self.restoreSelection)
         self.pushButton_11.clicked.connect(self.reserve_match)
 
         # Command Link Buttons
@@ -117,27 +117,49 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.commandLinkButton_4.setIcon(QtGui.QIcon(""))
         self.commandLinkButton_5.setIcon(QtGui.QIcon(""))
 
-        self.commandLinkButton.setMaximumSize(21,21)
-        self.commandLinkButton_2.setMaximumSize(21,21)
-        self.commandLinkButton_3.setMaximumSize(21,21)
-        self.commandLinkButton_4.setMaximumSize(21,21)
-        self.commandLinkButton_5.setMaximumSize(21,21)
+        self.commandLinkButton.setMaximumSize(21, 21)
+        self.commandLinkButton_2.setMaximumSize(21, 21)
+        self.commandLinkButton_3.setMaximumSize(21, 21)
+        self.commandLinkButton_4.setMaximumSize(21, 21)
+        self.commandLinkButton_5.setMaximumSize(21, 21)
 
-        self.commandLinkButton.setStyleSheet("""
-        QPushButton {border-image: url(bin/buttons/add-button-inside-black-circle.png);}
-        QPushButton:hover {border-image: url(bin/buttons/add-button-inside-black-circle_hover.png);}""")
-        self.commandLinkButton_2.setStyleSheet("""
-        QPushButton {border-image: url(bin/buttons/rounded-remove-button.png);}
-        QPushButton:hover {border-image: url(bin/buttons/rounded-remove-button_hover.png);}""")
-        self.commandLinkButton_3.setStyleSheet("""
-        QPushButton {border-image: url(bin/buttons/rounded-adjust-button-with-plus-and-minus.png);}
-        QPushButton:hover {border-image: url(bin/buttons/rounded-adjust-button-with-plus-and-minus_hover.png);}""")
-        self.commandLinkButton_4.setStyleSheet("""
-        QPushButton {border-image: url(bin/buttons/cancel-button.png);}
-        QPushButton:hover {border-image: url(bin/buttons/cancel-button_hover.png);}""")
-        self.commandLinkButton_5.setStyleSheet("""
-        QPushButton {border-image: url(bin/buttons/swap-vertical-orientation-arrows.png);}
-        QPushButton:hover {border-image: url(bin/buttons/swap-vertical-orientation-arrows_hover.png);}""")
+        self.commandLinkButton.setStyleSheet("QPushButton {border-image: url(%s);}"
+                                             "QPushButton:hover {border-image: url(%s);}" % (
+                                                 self.get_pathToTemp(os.path.join('bin', 'buttons',
+                                                                                  'add-button-inside-black-circle.png')),
+                                                 self.get_pathToTemp(os.path.join('bin', 'buttons',
+                                                                                  'add-button-inside-black-circle_hover.png')))
+                                             )
+        self.commandLinkButton_2.setStyleSheet("QPushButton {border-image: url(%s);}"
+                                               "QPushButton:hover {border-image: url(%s);}" % (
+                                                   self.get_pathToTemp(
+                                                       os.path.join('bin', 'buttons', 'rounded-remove-button.png')),
+                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
+                                                                                    'rounded-remove-button_hover.png')))
+                                               )
+        self.commandLinkButton_3.setStyleSheet("QPushButton {border-image: url(%s);}"
+                                               "QPushButton:hover {border-image: url(%s);}" % (
+                                                   self.get_pathToTemp(
+                                                       os.path.join('bin', 'buttons',
+                                                                    'rounded-adjust-button-with-plus-and-minus.png')),
+                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
+                                                                                    'rounded-adjust-button-with-plus-and-minus_hover.png')))
+                                               )
+        self.commandLinkButton_4.setStyleSheet("QPushButton {border-image: url(%s);}"
+                                               "QPushButton:hover {border-image: url(%s);}" % (
+                                                   self.get_pathToTemp(
+                                                       os.path.join('bin', 'buttons', 'cancel-button.png')),
+                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
+                                                                                    'cancel-button_hover.png')))
+                                               )
+        self.commandLinkButton_5.setStyleSheet("QPushButton {border-image: url(%s);}"
+                                               "QPushButton:hover {border-image: url(%s);}" % (
+                                                   self.get_pathToTemp(
+                                                       os.path.join('bin', 'buttons',
+                                                                    'swap-vertical-orientation-arrows.png')),
+                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
+                                                                                    'swap-vertical-orientation-arrows_hover.png')))
+                                               )
 
         self.commandLinkButton.clicked.connect(self.showFilterDialog)
         self.commandLinkButton_2.clicked.connect(self.removeSelectedItems)
@@ -367,7 +389,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         countTeams = 0
 
         if self.selection != []:
-            teamStr = ['home = "%s"' % i.text() for i in self.selection if i.data(QtCore.Qt.UserRole)==region]
+            teamStr = ['home = "%s"' % i.text() for i in self.selection if i.data(QtCore.Qt.UserRole) == region]
             teamStr = ' OR '.join(teamStr)
             countTeams = len(teamStr)
             if teamStr != '':
@@ -399,7 +421,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def removeSelectedItems(self):
         for i in self.listWidget.selectedItems():
-            if i.data(QtCore.Qt.UserRole)==self.comboBox.currentText():
+            if i.data(QtCore.Qt.UserRole) == self.comboBox.currentText():
                 self.listWidget.takeItem(self.listWidget.row(i))
 
     @QtCore.pyqtSlot()
