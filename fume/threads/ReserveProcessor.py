@@ -66,8 +66,9 @@ class ReserveProcessor(QtCore.QThread):
                             # already reserved
                             return match, raw[i + 7]  # Photographer
                     except:
-                        # free
-                        return match, None
+                        pass
+                    # match can be reserved
+                    return match, None
 
     def delete(self, match):
         print('delete', match['mafo_id'])
@@ -121,9 +122,15 @@ class ReserveProcessor(QtCore.QThread):
         alreadyReserved = []
         for match in self.selected:
             self.loggerSignal.emit("Reserviere %s - %s #%d" % (match['home'], match['guest'], match['match_id']))
-            matchNew, ph = self.reserve(match)
+            try:
+                matchNew, ph = self.reserve(match)
+            except Exception as e:
+                self.loggerSignal.emit("Fehler beim reservieren von %s" % match['match_id'])
+                self.driver.close()
+                print(e)
+                return
             match = matchNew
-            if ph != None:
+            if ph != []:
                 alreadyReserved.append([match, ph])
                 self.loggerSignal.emit("Bereits reserviert von %s" % ph)
                 self.markRowAsReserved(match, 2)
