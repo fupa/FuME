@@ -112,12 +112,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Command Link Buttons
         self.commandLinkButton.setIcon(QtGui.QIcon(""))
-        self.commandLinkButton.setMaximumSize(21,21)
-        # self.commandLinkButton.setIcon(QtGui.QIcon(self.get_pathToTemp(os.path.join("bin", "add-button-inside-black-circle.png"))))
         self.commandLinkButton_2.setIcon(QtGui.QIcon(""))
         self.commandLinkButton_3.setIcon(QtGui.QIcon(""))
         self.commandLinkButton_4.setIcon(QtGui.QIcon(""))
         self.commandLinkButton_5.setIcon(QtGui.QIcon(""))
+
+        self.commandLinkButton.setMaximumSize(21,21)
+        self.commandLinkButton_2.setMaximumSize(21,21)
+        self.commandLinkButton_3.setMaximumSize(21,21)
+        self.commandLinkButton_4.setMaximumSize(21,21)
+        self.commandLinkButton_5.setMaximumSize(21,21)
 
         self.commandLinkButton.setStyleSheet("""
         QPushButton {border-image: url(bin/buttons/add-button-inside-black-circle.png);}
@@ -134,8 +138,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.commandLinkButton_5.setStyleSheet("""
         QPushButton {border-image: url(bin/buttons/swap-vertical-orientation-arrows.png);}
         QPushButton:hover {border-image: url(bin/buttons/swap-vertical-orientation-arrows_hover.png);}""")
-
-        #self.commandLinkButton.resize(QtGui.QImage("bin/buttons/add-button-inside-black-circle2.png").size())
 
         self.commandLinkButton.clicked.connect(self.showFilterDialog)
         self.commandLinkButton_2.clicked.connect(self.removeSelectedItems)
