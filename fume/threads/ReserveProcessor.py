@@ -130,7 +130,7 @@ class ReserveProcessor(QtCore.QThread):
                 print(e)
                 return
             match = matchNew
-            if ph != []:
+            if ph != None:
                 alreadyReserved.append([match, ph])
                 self.loggerSignal.emit("Bereits reserviert von %s" % ph)
                 self.markRowAsReserved(match, 2)
@@ -145,8 +145,11 @@ class ReserveProcessor(QtCore.QThread):
         # for MessageBox
         if len(alreadyReserved) > 0:
             infoText = ''
-            for i in alreadyReserved:
-                infoText += ' '.join([i[0]['home'], '-', i[0]['guest'], 'von', i[1], '\n'])
+            try:
+                for i in alreadyReserved:
+                    infoText += ' '.join([i[0]['home'], '-', i[0]['guest'], 'von', i[1], '\n'])
+            except:
+                print(alreadyReserved)
             self.alreadyReservedSignal.emit(infoText)
 
         self.loggerSignal.emit('%s Spiele erfolgreich reserviert' % (counter - len(alreadyReserved)))
