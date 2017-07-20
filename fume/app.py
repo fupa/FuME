@@ -58,8 +58,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-        self.label.setPixmap(QtGui.QPixmap(self.get_pathToTemp("bin/header_klein.png")))
-        self.statusBar.showMessage("Willkommen!")
+        self.set_statusBar()
+        self.label.setPixmap(QtGui.QPixmap(self.get_pathToTemp(os.path.join("bin", "header_klein.png"))))
 
         self.read_settings()
 
@@ -92,16 +92,64 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.show()
 
+    def set_statusBar(self):
+        self.statusBar.showMessage("Willkommen!")
+
+        # Permanent labels
+        self.statusBarLabel_1 = QtWidgets.QLabel(self.statusBar)
+        self.statusBar.addPermanentWidget(self.statusBarLabel_1, 0)
+
     def set_connections(self):
-        self.pushButton.clicked.connect(self.showFilterDialog)
-        self.pushButton_2.clicked.connect(self.invertSelection)
+        # Push Buttons
+        #self.pushButton.clicked.connect(self.showFilterDialog)
+        #self.pushButton_2.clicked.connect(self.invertSelection)
         self.pushButton_3.clicked.connect(self.logDialog.show)
         self.pushButton_4.clicked.connect(self.settingsDialog.show)
         self.pushButton_5.clicked.connect(self.download_match)
-        self.pushButton_9.clicked.connect(self.listWidget.selectionModel().clearSelection)
-        self.pushButton_10.clicked.connect(self.restoreSelection)
+        #self.pushButton_9.clicked.connect(self.listWidget.selectionModel().clearSelection)
+        #self.pushButton_10.clicked.connect(self.restoreSelection)
         self.pushButton_11.clicked.connect(self.reserve_match)
 
+        # Command Link Buttons
+        self.commandLinkButton.setIcon(QtGui.QIcon(""))
+        self.commandLinkButton.setMaximumSize(21,21)
+        # self.commandLinkButton.setIcon(QtGui.QIcon(self.get_pathToTemp(os.path.join("bin", "add-button-inside-black-circle.png"))))
+        self.commandLinkButton_2.setIcon(QtGui.QIcon(""))
+        self.commandLinkButton_3.setIcon(QtGui.QIcon(""))
+        self.commandLinkButton_4.setIcon(QtGui.QIcon(""))
+        self.commandLinkButton_5.setIcon(QtGui.QIcon(""))
+
+        self.commandLinkButton.setStyleSheet("""
+        QPushButton {border-image: url(bin/buttons/add-button-inside-black-circle.png);}
+        QPushButton:hover {border-image: url(bin/buttons/add-button-inside-black-circle_hover.png);}""")
+        self.commandLinkButton_2.setStyleSheet("""
+        QPushButton {border-image: url(bin/buttons/rounded-remove-button.png);}
+        QPushButton:hover {border-image: url(bin/buttons/rounded-remove-button_hover.png);}""")
+        self.commandLinkButton_3.setStyleSheet("""
+        QPushButton {border-image: url(bin/buttons/rounded-adjust-button-with-plus-and-minus.png);}
+        QPushButton:hover {border-image: url(bin/buttons/rounded-adjust-button-with-plus-and-minus_hover.png);}""")
+        self.commandLinkButton_4.setStyleSheet("""
+        QPushButton {border-image: url(bin/buttons/cancel-button.png);}
+        QPushButton:hover {border-image: url(bin/buttons/cancel-button_hover.png);}""")
+        self.commandLinkButton_5.setStyleSheet("""
+        QPushButton {border-image: url(bin/buttons/swap-vertical-orientation-arrows.png);}
+        QPushButton:hover {border-image: url(bin/buttons/swap-vertical-orientation-arrows_hover.png);}""")
+
+        #self.commandLinkButton.resize(QtGui.QImage("bin/buttons/add-button-inside-black-circle2.png").size())
+
+        self.commandLinkButton.clicked.connect(self.showFilterDialog)
+        self.commandLinkButton_2.clicked.connect(self.removeSelectedItems)
+        self.commandLinkButton_3.clicked.connect(self.invertSelection)
+        self.commandLinkButton_4.clicked.connect(self.resetSelection)
+        self.commandLinkButton_5.clicked.connect(self.restoreSelection)
+
+        self.commandLinkButton.setToolTip("Auswahl hinzufügen")
+        self.commandLinkButton_2.setToolTip("Auswahl entfernen")
+        self.commandLinkButton_3.setToolTip("Auswahl umkehren")
+        self.commandLinkButton_4.setToolTip("Auswahl löschen")
+        self.commandLinkButton_5.setToolTip("Auswahl zurücksetzen")
+
+        # Other
         self.dateEdit_3.dateChanged.connect(self.date_changed)
         self.dateEdit_4.dateChanged.connect(self.date_changed)
         self.lineEdit.textChanged.connect(self.lineEdit_changed)
@@ -161,7 +209,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def set_listWidget(self):
         # Sets the default values if the fume is closed without any elements in listWidget
         # Important: These values are preset and defined in .ui file
-        defaults = ['Noch keine Mannschaften hinzugefügt...', 'Region wählen und unten links auf konfigurieren klicken']
+        defaults = ['Noch keine Mannschaften hinzugefügt...', 'Region wählen und unten auf "+" klicken']
         elements = self.settings.value('filter', defaults)
         if elements != defaults and len(elements) != 0:
             self.listWidget.clear()
@@ -305,19 +353,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 if itemData != region and itemData != None:
                     self.listWidget.item(i).setHidden(True)
 
+        # trigger itemSelection_changed for multiregion support
+        self.itemSelection_changed()
+
     @QtCore.pyqtSlot()
     def itemSelection_changed(self):
+        region = self.comboBox.currentText()
         self.selection = self.listWidget.selectedItems()
+
+        self.matchFilterString = ''
+        countTeams = 0
+
         if self.selection != []:
-            self.matchFilterString = '(' + ' OR '.join(['home = "%s"' % i.text() for i in self.selection]) + ')'
-        else:  # show all
-            self.matchFilterString = ''
+            teamStr = ['home = "%s"' % i.text() for i in self.selection if i.data(QtCore.Qt.UserRole)==region]
+            teamStr = ' OR '.join(teamStr)
+            countTeams = len(teamStr)
+            if teamStr != '':
+                # no selection in current region found
+                self.matchFilterString = '(' + teamStr + ')'
 
         self.sqlmodel_calendar.setFilter(self.get_filterString())
         self.sqlmodel_calendar.select()
         # self.tableView_2.resizeColumnsToContents()
-        self.label_6.setText('%s' % len(self.selection))
-        self.label_7.setText('%s' % self.sqlmodel_calendar.rowCount())
+        self.statusBarLabel_1.setText('%s Mannschaften / %s Spiele' % (countTeams, self.sqlmodel_calendar.rowCount()))
 
     @QtCore.pyqtSlot()
     def restoreSelection(self):
@@ -327,10 +385,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.listWidget.setCurrentItem(x, QtCore.QItemSelectionModel.Select)
 
     @QtCore.pyqtSlot()
+    def resetSelection(self):
+        self.listWidget.selectionModel().clearSelection()
+
+    @QtCore.pyqtSlot()
     def invertSelection(self):
         for i in range(self.listWidget.count()):
             if not self.listWidget.item(i).isHidden():
                 self.listWidget.setCurrentRow(i, QtCore.QItemSelectionModel.Toggle)
+
+    @QtCore.pyqtSlot()
+    def removeSelectedItems(self):
+        for i in self.listWidget.selectedItems():
+            if i.data(QtCore.Qt.UserRole)==self.comboBox.currentText():
+                self.listWidget.takeItem(self.listWidget.row(i))
 
     @QtCore.pyqtSlot()
     def reserve_match(self):
