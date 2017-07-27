@@ -26,7 +26,7 @@ class DownloadProcessor(QtCore.QThread):
     def download(self, date):
         uAStr = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'
         headers = {'User-Agent': uAStr}
-        url = 'http://www.fupa.net/index.php?page=kalender&site_linkurl=%s&date=%s' % (self.region, date)
+        url = 'https://www.fupa.net/index.php?page=kalender&site_linkurl=%s&date=%s' % (self.region, date)
         r = requests.get(url, headers=headers)
         doc = lxml.html.fromstring(r.content)
 
@@ -39,7 +39,7 @@ class DownloadProcessor(QtCore.QThread):
         raw = doc.xpath(path)
 
         # replacing '-Live-' with '-:-'
-        raw = [i.replace('http://www.fupa.net/fupa/images/buttons/tipp_live.jpg', '-:-') for i in raw]
+        raw = [i.replace('https://www.fupa.net/fupa/images/buttons/tipp_live.jpg', '-:-') for i in raw]
 
         # From
         # ['/liga/bezirksliga-west-31261.html', 'Bezirksliga West', '19:15 Uhr', 'TSV Abensberg', '-:-',
