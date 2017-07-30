@@ -1,6 +1,6 @@
 <img src="bin/header.png" alt="FuME FuPa Match Explorer" width="400">
 
-[![Requirements Status](https://requires.io/github/fupadev/FuME/requirements.svg?branch=master)](https://requires.io/github/fupadev/FuME/requirements/?branch=master)
+<!--- [![Requirements Status](https://requires.io/github/fupadev/FuME/requirements.svg?branch=master)](https://requires.io/github/fupadev/FuME/requirements/?branch=master) -->
 [![Github All Releases](https://img.shields.io/github/downloads/fupadev/fume/total.svg)](https://github.com/fupadev/FuME/releases)
 [![GitHub release](https://img.shields.io/github/release/fupadev/fume.svg)](https://github.com/fupadev/FuME/releases/latest)
 
@@ -69,7 +69,7 @@ Für alle Funktionen, die Zugang zur [Vereinsverwaltung](https://www.fupa.net/fu
 
 ## Todos
  - [ ] Reservierungsübersicht
- - [ ] MacOS App Code Signing
+ - [x] MacOS App
  - [x] Windows Exe
 
 ## Bugs / Kontakt
@@ -78,4 +78,5 @@ Bei Fragen oder Probleme eine Mail an <fume@afeldl.de>
 
 ## Lizenz / Credit
 Dieses Projekt verwendet die LGPL v3 Lizenz, siehe Qts [Obligations of the LGPL](https://www.qt.io/qt-licensing-terms/)      
-Basic Icon made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](http://www.flaticon.com) 
+Basic Logo made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](http://www.flaticon.com) 
+and Icon by <a href="http://www.flaticon.com/authors/google" title="Google">Google</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
