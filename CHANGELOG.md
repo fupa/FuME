@@ -1,7 +1,8 @@
-## 1.1
+## 1.1 (tba)
 
 - High-DPI für Retina Displays
 - kleine Design-Anpassungen
+- Nutze FuPas HTTPS Verbindung
 - Bug-Fixes:
     - keine doppelten Einträge im Filter
     - kein Absturz beim reservieren seiner eigenen Galerie
