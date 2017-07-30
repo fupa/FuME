@@ -12,6 +12,7 @@ class FilterDialog(QtWidgets.QDialog, Ui_filter):
     def __init__(self, parent=None):
         super(FilterDialog, self).__init__(parent)
         self.setupUi(self)
+        self.setModal(True)
 
         self.settings = QtCore.QSettings('fume', 'Match-Explorer')
 

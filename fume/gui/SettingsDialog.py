@@ -20,6 +20,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
     def __init__(self, parent=None):
         super(SettingsDialog, self).__init__(parent)
         self.setupUi(self)
+        self.setModal(True)
         self.settings = QtCore.QSettings('fume', 'Match-Explorer')
 
         # Connections
@@ -40,10 +41,19 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
 
         return os.path.join(base_path, relative_path)
 
+    def isFrozen(self):
+        # TODO Use this
+        if getattr(sys, 'frozen', False):
+            return True
+        else:
+            return False
+
     @QtCore.pyqtSlot()
     def createCookie(self):
         __username = self.lineEdit.text()
         __password = self.lineEdit_2.text()
+
+        # TODO webdriver.Chrome -> webdirver.Remote wie in ../simpleqt/main.py
 
         options = webdriver.ChromeOptions()
         # waiting for Chrome 60 on Windows

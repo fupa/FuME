@@ -99,6 +99,7 @@ class ReserveProcessor(QtCore.QThread):
 
         options = webdriver.ChromeOptions()
 
+        # TODO: Umstellung von webdriver.Chrome() auf webdriver.Remote()
         try:
             sys._MEIPASS
             # runs as app  - get path to chromedriver in project folder
