@@ -43,7 +43,7 @@ build_app() {
 build_dmg() {
     msg_status "Building FuME.dmg in 'dist'"
     cd dist
-    dmgbuild -s ../dmgbuild.py -D app=FuME.app "FuME" FuME.dmg
+    dmgbuild -s ../dmgsettings.py "FuME" FuME.dmg
     cd ..
     msg_status "Finished building .dmg"
 }
