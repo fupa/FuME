@@ -32,10 +32,7 @@ if platform == "darwin" or platform == "linux" or platform == "linux2":
              ('bin/header_klein.png', 'bin/.'),
              ('bin/header.png', 'bin/.'),  # for splas screen
              ('bin/buttons', 'bin/buttons/.')]
-
     icon = 'bin/icon.icns'
-
-
 else:
     # Windows
     os = 'windows'
@@ -47,7 +44,6 @@ else:
              ('bin\\header_klein.png', 'bin\\.'),
              ('bin\\header.png', 'bin\\.'),
              ('bin\\buttons\\', 'bin\\buttons\\.')]
-
     icon = 'bin\\icon.ico'
 
 a = Analysis(['main.py'],
@@ -63,6 +59,7 @@ a = Analysis(['main.py'],
              cipher=block_cipher)
 pyz = PYZ(a.pure, a.zipped_data,
           cipher=block_cipher)
+
 if os == 'unix':
     exe = EXE(pyz,
               a.scripts,
@@ -87,6 +84,7 @@ else:
               upx=True,
               console=console,
               icon=icon)
+
 coll = COLLECT(exe,
                a.binaries,
                a.zipfiles,
@@ -94,6 +92,7 @@ coll = COLLECT(exe,
                strip=False,
                upx=True,
                name=name)
+
 app = BUNDLE(coll,
              name=name + '.app',
              version=version,
