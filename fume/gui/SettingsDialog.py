@@ -7,8 +7,8 @@ import time
 
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
-from selenium import common
 from selenium import webdriver
+from selenium.webdriver import Remote
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -53,8 +53,6 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
         __username = self.lineEdit.text()
         __password = self.lineEdit_2.text()
 
-        # TODO webdriver.Chrome -> webdirver.Remote wie in ../simpleqt/main.py
-
         options = webdriver.ChromeOptions()
         # waiting for Chrome 60 on Windows
         # Chrome 59 for macOS already supports headless Chrome!
@@ -64,17 +62,13 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
         msgBox = QtWidgets.QMessageBox()
 
         try:
-            sys._MEIPASS
-            # runs as app  - get path to chromedriver in project folder
-            self.driver = webdriver.Chrome(self.get_pathToTemp('chromedriver'), chrome_options=options)
-        except AttributeError:
-            # runs in terminal - using chromedriver in $PATH
-            self.driver = webdriver.Chrome(chrome_options=options)
-        except common.exceptions.WebDriverException:
-            # no Chrome found
-            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keinen Treiber gefunden!"),
-                                           QtWidgets.qApp.tr("Kein Google Chrome installiert!\n\n"
-                                                             "Chrome installieren um forzufahren."),
+            self.driver = Remote('http://localhost:9515', desired_capabilities=options.to_capabilities())
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keine Verbindung zu Google Chrome!"),
+                                           QtWidgets.qApp.tr(
+                                               "Es konnte keine Verbindung zu Google Chrome hergestellt werden! "
+                                               "Bitte stelle sicher, dass alle Systemvoraussetzungen erfüllt sind.\n\n"
+                                               "Fehler:\n" + str(e)),
                                            QtWidgets.QMessageBox.Cancel)
             return
 

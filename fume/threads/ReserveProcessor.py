@@ -9,9 +9,8 @@ import sys
 import lxml.html
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
-from selenium import common
 from selenium import webdriver
-from seleniumrequests import Chrome
+from seleniumrequests import Remote
 
 
 class ReserveProcessor(QtCore.QThread):
@@ -98,20 +97,16 @@ class ReserveProcessor(QtCore.QThread):
         counter = 0
 
         options = webdriver.ChromeOptions()
+        # options.add_argument('--headless')
 
-        # TODO: Umstellung von webdriver.Chrome() auf webdriver.Remote()
         try:
-            sys._MEIPASS
-            # runs as app  - get path to chromedriver in project folder
-            self.driver = Chrome(self.get_pathToTemp('chromedriver'), chrome_options=options)
-        except AttributeError:
-            # runs in terminal - using chromedriver in $PATH
-            self.driver = Chrome(chrome_options=options)
-        except common.exceptions.WebDriverException:
-            # no Chrome found
-            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keinen Treiber gefunden!"),
-                                           QtWidgets.qApp.tr("Kein Google Chrome installiert!\n\n"
-                                                             "Chrome installieren um forzufahren."),
+            self.driver = Remote('http://localhost:9515', desired_capabilities=options.to_capabilities())
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keine Verbindung zu Google Chrome!"),
+                                           QtWidgets.qApp.tr(
+                                               "Es konnte keine Verbindung zu Google Chrome hergestellt werden! "
+                                               "Bitte stelle sicher, dass alle Systemvoraussetzungen erfüllt sind.\n\n"
+                                               "Fehler:\n" + str(e)),
                                            QtWidgets.QMessageBox.Cancel)
             return
 
