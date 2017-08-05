@@ -30,7 +30,7 @@ if platform == "darwin" or platform == "linux" or platform == "linux2":
     binaries = [('chromedriver', '.')]
     datas = [('db/sql_default.db', 'db/.'),
              ('bin/header_klein.png', 'bin/.'),
-             ('bin/header.png', 'bin/.'),  # for splas screen
+             #('bin/header.png', 'bin/.'),  # for splash screen
              ('bin/buttons', 'bin/buttons/.')]
     icon = 'bin/icon.icns'
 else:
@@ -38,11 +38,11 @@ else:
     os = 'windows'
     pathex = ['C:\\Users\\Andreas\\Documents\\fume',
               'C:\\Program Files\\Python35\\Lib\\site-packages\\PyQt5\\Qt\\bin',
-              'C:\\Program Files (x86)\\Windows Kits\\10\\Redist\\ucrt\\DLLs\\x64'],
+              'C:\\Program Files (x86)\\Windows Kits\\10\\Redist\\ucrt\\DLLs\\x64']
     binaries = [('chromedriver.exe', '.')]
     datas = [('db\\sql_default.db', 'db\\.'),
              ('bin\\header_klein.png', 'bin\\.'),
-             ('bin\\header.png', 'bin\\.'),
+             #('bin\\header.png', 'bin\\.'),
              ('bin\\buttons\\', 'bin\\buttons\\.')]
     icon = 'bin\\icon.ico'
 
@@ -78,7 +78,6 @@ else:
               a.zipfiles,
               a.datas,
               name=name,
-              version=version,
               debug=debug,
               strip=False,
               upx=True,
