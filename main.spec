@@ -43,6 +43,7 @@ else:
     datas = [('db\\sql_default.db', 'db\\.'),
              ('bin\\header_klein.png', 'bin\\.'),
              #('bin\\header.png', 'bin\\.'),
+             ('bin\\icon.ico', 'bin\\.'),
              ('bin\\buttons\\', 'bin\\buttons\\.')]
     icon = 'bin\\icon.ico'
 
