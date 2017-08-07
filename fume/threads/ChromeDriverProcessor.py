@@ -15,8 +15,8 @@ class ChromeDriverProcessor(QtCore.QThread):
     def __init__(self, options):
         super(ChromeDriverProcessor, self).__init__(options['parent'])
 
-    def __del__(self):
-        self.wait()
+    # def __del__(self):
+    #     self.wait()
 
     def isFrozen(self):
         if getattr(sys, 'frozen', False):
