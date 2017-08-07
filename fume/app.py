@@ -17,6 +17,7 @@ from fume.gui.FilterDialog import FilterDialog
 from fume.gui.LogDialog import LogDialog
 from fume.gui.SettingsDialog import SettingsDialog
 from fume.threads.DownloadProcessor import DownloadProcessor
+from fume.threads.ChromeDriverProcessor import ChromeDriverProcessor
 from fume.threads.ReserveProcessor import ReserveProcessor
 from fume.ui.mainwindow import Ui_MainWindow
 
@@ -77,6 +78,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             sys.exit(1)
 
         self.set_menuBar()
+        self.set_chromeDriver()
         self.set_connections()
         self.set_tableStyleSheet()
         self.set_tableView()
@@ -310,6 +312,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, QCloseEvent):
         self.write_settings()
+        self.chromeDriver.quit()
         self.db.close()
 
     @QtCore.pyqtSlot()
@@ -505,6 +508,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.downloadProcessor.statusBarSignal.connect(self.statusBar.showMessage)
 
         self.downloadProcessor.start()
+
+    @QtCore.pyqtSlot()
+    def set_chromeDriver(self):
+        options = {'parent': self}
+        self.chromeDriver = ChromeDriverProcessor(options)
+
+        self.chromeDriver.loggerSignal.connect(self.logDialog.add)
+
+        self.chromeDriver.start()
+
 
 
 def run():
