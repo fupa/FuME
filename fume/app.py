@@ -12,12 +12,15 @@ from PyQt5 import QtGui
 from PyQt5 import QtSql
 from PyQt5 import QtWidgets
 
+from fume.gui.AboutDialog import AboutDialog
 from fume.gui.FilterDialog import FilterDialog
 from fume.gui.LogDialog import LogDialog
 from fume.gui.SettingsDialog import SettingsDialog
 from fume.threads.DownloadProcessor import DownloadProcessor
 from fume.threads.ReserveProcessor import ReserveProcessor
 from fume.ui.mainwindow import Ui_MainWindow
+
+version = '1.1'
 
 
 class CustomSqlModel(QtSql.QSqlQueryModel):
@@ -59,16 +62,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         self.set_statusBar()
-        self.label.setPixmap(QtGui.QPixmap(self.get_pathToTemp(os.path.join("bin", "header_klein.png"))))
-
         self.read_settings()
+
+        if sys.platform == "win32":
+            self.setWindowIcon(QtGui.QIcon(self.get_pathToTemp(['bin', 'icon.ico'])))
+        header = self.get_pathToTemp(["bin", "header_klein.png"])
+        self.label.setPixmap(QtGui.QPixmap(header))
 
         self.logDialog = LogDialog(self)
         self.settingsDialog = SettingsDialog(self)
+        self.aboutDialog = AboutDialog(path=header, version=version, parent=self)
 
         if not self.set_database():
             sys.exit(1)
 
+        self.set_menuBar()
         self.set_connections()
         self.set_tableStyleSheet()
         self.set_tableView()
@@ -82,13 +90,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.set_listWidget()
         self.comboBox_changed()  # set region
 
-        # last tweaks on tableView before show()
         self.tableView.hideColumn(7)
         self.tableView.hideColumn(8)
 
-        widths = [72, 220, 125, 220, 220, 60, 140]
-        for i, d in enumerate(widths):
-            self.tableView.setColumnWidth(i, d)
+        # widths = [72, 220, 125, 220, 220, 60, 140]
+        # for i, d in enumerate(widths):
+        #     self.tableView.setColumnWidth(i, d)
+        self.tableView.resizeColumnsToContents()
+
+        # Fixes "Error": (from https://stackoverflow.com/a/39311662/6304901)
+        # QBasicTimer::start: QBasicTimer can only be used with threads started with QThread
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         self.show()
 
@@ -99,79 +111,59 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.statusBarLabel_1 = QtWidgets.QLabel(self.statusBar)
         self.statusBar.addPermanentWidget(self.statusBarLabel_1, 0)
 
+    def set_menuBar(self):
+        # macOS
+        self.actionPreferences.triggered.connect(self.settingsDialog.show)
+        self.actionAbout.triggered.connect(self.aboutDialog.show)
+        self.actionQuit.triggered.connect(self.close)
+
+        self.actionLog_2.triggered.connect(self.logDialog.show)
+
+        # Windows
+        self.actionUeber.triggered.connect(self.aboutDialog.show)
+        self.actionEinstellungen.triggered.connect(self.settingsDialog.show)
+        self.actionLog.triggered.connect(self.logDialog.show)
+        self.actionSchlie_en.triggered.connect(self.close)
+
+        if sys.platform == "win32":
+            # disable mac-specific menus
+            self.menuSettings.menuAction().setVisible(False)
+            self.menuAblage.menuAction().setVisible(False)
+        else:
+            # disable windows-specific menus
+            self.menuDatei.menuAction().setVisible(False)
+
     def set_connections(self):
         # Push Buttons
         # self.pushButton.clicked.connect(self.showFilterDialog)
         # self.pushButton_2.clicked.connect(self.invertSelection)
-        self.pushButton_3.clicked.connect(self.logDialog.show)
-        self.pushButton_4.clicked.connect(self.settingsDialog.show)
+        # self.pushButton_3.clicked.connect(self.logDialog.show)
+        # self.pushButton_4.clicked.connect(self.settingsDialog.show)
         self.pushButton_5.clicked.connect(self.download_match)
         # self.pushButton_9.clicked.connect(self.listWidget.selectionModel().clearSelection)
         # self.pushButton_10.clicked.connect(self.restoreSelection)
         self.pushButton_11.clicked.connect(self.reserve_match)
 
         # Command Link Buttons
-        self.commandLinkButton.setIcon(QtGui.QIcon(""))
-        self.commandLinkButton_2.setIcon(QtGui.QIcon(""))
-        self.commandLinkButton_3.setIcon(QtGui.QIcon(""))
-        self.commandLinkButton_4.setIcon(QtGui.QIcon(""))
-        self.commandLinkButton_5.setIcon(QtGui.QIcon(""))
+        base = self.get_pathToTemp(['bin', 'buttons'], True)
+        buttons = [self.commandLinkButton, self.commandLinkButton_2, self.commandLinkButton_3, self.commandLinkButton_4,
+                   self.commandLinkButton_5]
+        images = ['add-button-inside-black-circle', 'rounded-remove-button',
+                  'rounded-adjust-button-with-plus-and-minus', 'cancel-button', 'swap-vertical-orientation-arrows']
+        connections = [self.showFilterDialog, self.removeSelectedItems, self.invertSelection, self.resetSelection,
+                       self.restoreSelection]
+        tooltips = ["Auswahl hinzufügen", "Auswahl entfernen", "Auswahl umkehren", "Auswahl löschen",
+                    "Auswahl zurücksetzen"]
 
-        self.commandLinkButton.setMaximumSize(21, 21)
-        self.commandLinkButton_2.setMaximumSize(21, 21)
-        self.commandLinkButton_3.setMaximumSize(21, 21)
-        self.commandLinkButton_4.setMaximumSize(21, 21)
-        self.commandLinkButton_5.setMaximumSize(21, 21)
-
-        self.commandLinkButton.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                             "QPushButton:hover {border-image: url(%s);}" % (
-                                                 self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                  'add-button-inside-black-circle.png')),
-                                                 self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                  'add-button-inside-black-circle_hover.png')))
-                                             )
-        self.commandLinkButton_2.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                               "QPushButton:hover {border-image: url(%s);}" % (
-                                                   self.get_pathToTemp(
-                                                       os.path.join('bin', 'buttons', 'rounded-remove-button.png')),
-                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                    'rounded-remove-button_hover.png')))
-                                               )
-        self.commandLinkButton_3.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                               "QPushButton:hover {border-image: url(%s);}" % (
-                                                   self.get_pathToTemp(
-                                                       os.path.join('bin', 'buttons',
-                                                                    'rounded-adjust-button-with-plus-and-minus.png')),
-                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                    'rounded-adjust-button-with-plus-and-minus_hover.png')))
-                                               )
-        self.commandLinkButton_4.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                               "QPushButton:hover {border-image: url(%s);}" % (
-                                                   self.get_pathToTemp(
-                                                       os.path.join('bin', 'buttons', 'cancel-button.png')),
-                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                    'cancel-button_hover.png')))
-                                               )
-        self.commandLinkButton_5.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                               "QPushButton:hover {border-image: url(%s);}" % (
-                                                   self.get_pathToTemp(
-                                                       os.path.join('bin', 'buttons',
-                                                                    'swap-vertical-orientation-arrows.png')),
-                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                    'swap-vertical-orientation-arrows_hover.png')))
-                                               )
-
-        self.commandLinkButton.clicked.connect(self.showFilterDialog)
-        self.commandLinkButton_2.clicked.connect(self.removeSelectedItems)
-        self.commandLinkButton_3.clicked.connect(self.invertSelection)
-        self.commandLinkButton_4.clicked.connect(self.resetSelection)
-        self.commandLinkButton_5.clicked.connect(self.restoreSelection)
-
-        self.commandLinkButton.setToolTip("Auswahl hinzufügen")
-        self.commandLinkButton_2.setToolTip("Auswahl entfernen")
-        self.commandLinkButton_3.setToolTip("Auswahl umkehren")
-        self.commandLinkButton_4.setToolTip("Auswahl löschen")
-        self.commandLinkButton_5.setToolTip("Auswahl zurücksetzen")
+        for button, image, connection, tooltip in zip(buttons, images, connections, tooltips):
+            button.setIcon(QtGui.QIcon(""))  # removing default image set by QtDesigner
+            button.setMaximumSize(21, 21)
+            button.setStyleSheet(
+                "QPushButton {{border-image: url({base}/{image}.png);}}"
+                "QPushButton:hover {{border-image: url({base}/{image}_hover.png);}}".format(base=base, image=image)
+            )
+            button.clicked.connect(connection)
+            button.setToolTip(tooltip)
 
         # Other
         self.dateEdit_3.dateChanged.connect(self.date_changed)
@@ -257,13 +249,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # print(str)
         return str
 
-    def get_pathToTemp(self, relative_path):
+    def get_pathToTemp(self, relative_path, css=False):
+        # relative_path is a List or Array
+        # set css to True if used for .setStyleSheet so '/' is set as separator instead of '\\'
         try:
             base_path = sys._MEIPASS
         except Exception:
             base_path = os.path.abspath(".")
 
-        return os.path.join(base_path, relative_path)
+        if css and sys.platform == "win32":
+            # Fixes "could not parse stylesheet of object ..." thrown by .setStyleSheet
+            return os.path.join(base_path, *relative_path).replace("\\", "/")
+
+        return os.path.join(base_path, *relative_path)
 
     def hideAll(self):
         for i in range(0, self.listWidget.count()):
@@ -274,6 +272,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.listWidget.item(i).setHidden(False)
 
     def write_settings(self):
+        # $HOME/Library/Preferences/com.fume.Match-Explorer.plist
+        self.settings.setValue('mainwindow/size', self.size())
+        self.settings.setValue('mainwindow/pos', self.pos())
+
         self.settings.setValue('date_from_calendar', self.dateEdit_3.date())
         self.settings.setValue('date_to_calendar', self.dateEdit_4.date())
         self.settings.setValue('filter_calendar', [x.text() for x in self.listWidget.selectedItems()])
@@ -284,6 +286,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def read_settings(self):
         self.settings = QtCore.QSettings('fume', 'Match-Explorer')
+
+        self.resize(self.settings.value('mainwindow/size', self.size()))
+        try:
+            self.move(self.settings.value('mainwindow/pos'))
+        except:
+            pass
+
         now = datetime.datetime.now()
         self.dateEdit_3.setDate(self.settings.value('date_from_calendar', QtCore.QDate(now.year, now.month, now.day)))
         self.dateEdit_4.setDate(self.settings.value('date_to_calendar', QtCore.QDate(now.year, now.month, now.day)))
@@ -292,7 +301,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # Windows: C:\Documents and Settings\<User>\Application Data\Local Settings\FuME\FuME
         # macOS: /Users/<User>/Library/Application Support/FuME
         userDataDir = appdirs.user_data_dir('FuME', 'FuME')
-        src = self.get_pathToTemp(os.path.join('db', 'sql_default.db'))
+        src = self.get_pathToTemp(['db', 'sql_default.db'])
         dst = os.path.join(userDataDir, 'sql.db')
         if not os.path.exists(userDataDir):
             os.makedirs(userDataDir)
@@ -398,7 +407,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.sqlmodel_calendar.setFilter(self.get_filterString())
         self.sqlmodel_calendar.select()
-        # self.tableView_2.resizeColumnsToContents()
+        if self.sqlmodel_calendar.rowCount() > 0:
+            self.tableView.resizeColumnsToContents()
         self.statusBarLabel_1.setText('%s Mannschaften / %s Spiele' % (countTeams, self.sqlmodel_calendar.rowCount()))
 
     @QtCore.pyqtSlot()
@@ -456,6 +466,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.reserveProcess.statusBarSignal.connect(self.statusBar.showMessage)
         self.reserveProcess.alreadyReservedSignal.connect(self.alreadyReservedMessageBox)
         self.reserveProcess.finished.connect(self.sqlmodel_calendar.select)
+        self.reserveProcess.finished.connect(self.tableView.resizeColumnsToContents)
 
         self.reserveProcess.start()
 
@@ -489,7 +500,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Connections
         self.downloadProcessor.finished.connect(self.sqlmodel_calendar.select)
-        # self.downloadProcessor.finished.connect(self.tableView_2.resizeColumnsToContents)
+        self.downloadProcessor.finished.connect(self.tableView.resizeColumnsToContents)
         self.downloadProcessor.loggerSignal.connect(self.logDialog.add)
         self.downloadProcessor.statusBarSignal.connect(self.statusBar.showMessage)
 
