@@ -28,7 +28,6 @@ class Ui_Settings(object):
         self.horizontalLayout.addWidget(self.pushButton_2)
         self.gridLayout.addWidget(self.frame_2, 2, 0, 1, 1)
         self.buttonBox = QtWidgets.QDialogButtonBox(Settings)
-        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout.addWidget(self.buttonBox, 4, 0, 1, 1)
