@@ -9,6 +9,7 @@ from PyQt5 import QtCore
 
 
 class ChromeDriverProcessor(QtCore.QThread):
+    loggerSignal = QtCore.pyqtSignal(str)
     statusBarSignal = QtCore.pyqtSignal(str)
 
     def __init__(self, options):
