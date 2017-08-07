@@ -20,8 +20,8 @@ class DownloadProcessor(QtCore.QThread):
         self.date_to = options['date-to']
         self.dbPath = options['database-path']
 
-    def __del__(self):
-        self.wait()
+    # def __del__(self):
+    #     self.wait()
 
     def download(self, date):
         uAStr = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'

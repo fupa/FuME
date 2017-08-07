@@ -27,8 +27,8 @@ class ReserveProcessor(QtCore.QThread):
         self.dbPath = options['database-path']
         self.baseUrl = 'https://www.fupa.net/fupa/admin/index.php?page=fotograf_spiele'
 
-    def __del__(self):
-        self.wait()
+    # def __del__(self):
+    #     self.wait()
 
     def reserve(self, match):
         payload = {'match_selected': match['match_id'],
