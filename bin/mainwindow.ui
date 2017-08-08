@@ -338,9 +338,25 @@
     </property>
     <addaction name="actionLog_2"/>
    </widget>
+   <widget class="QMenu" name="menuAnsicht">
+    <property name="title">
+     <string>Ansicht</string>
+    </property>
+    <widget class="QMenu" name="menuDatum">
+     <property name="title">
+      <string>Datum</string>
+     </property>
+     <addaction name="actionHeute"/>
+     <addaction name="separator"/>
+     <addaction name="actionZeitpunkt"/>
+     <addaction name="actionZeitraum"/>
+    </widget>
+    <addaction name="menuDatum"/>
+   </widget>
    <addaction name="menuSettings"/>
    <addaction name="menuDatei"/>
    <addaction name="menuAblage"/>
+   <addaction name="menuAnsicht"/>
   </widget>
   <action name="actionPreferences">
    <property name="text">
@@ -380,6 +396,27 @@
   <action name="actionLog_2">
    <property name="text">
     <string>Log anzeigen</string>
+   </property>
+  </action>
+  <action name="actionZeitpunkt">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Zeitpunkt</string>
+   </property>
+  </action>
+  <action name="actionZeitraum">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Zeitraum</string>
+   </property>
+  </action>
+  <action name="actionHeute">
+   <property name="text">
+    <string>heute</string>
    </property>
   </action>
  </widget>

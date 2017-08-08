@@ -91,6 +91,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.date_changed()  # set date-range
         self.set_listWidget()
         self.comboBox_changed()  # set region
+        self.datePeriodMenu_changed()
 
         self.tableView.hideColumn(7)
         self.tableView.hideColumn(8)
@@ -126,6 +127,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionEinstellungen.triggered.connect(self.settingsDialog.show)
         self.actionLog.triggered.connect(self.logDialog.show)
         self.actionSchlie_en.triggered.connect(self.close)
+
+        # both
+        self.actionHeute.triggered.connect(self.set_timeEditNow)
+
+        # Date -> Range
+        dateRangeGroup = QtWidgets.QActionGroup(self)
+        dateRangeGroup.addAction(self.actionZeitpunkt)
+        dateRangeGroup.addAction(self.actionZeitraum)
+
+        self.actionZeitraum.changed.connect(self.datePeriodMenu_changed)
+        self.actionZeitpunkt.changed.connect(self.datePeriodMenu_changed)
 
         if sys.platform == "win32":
             # disable mac-specific menus
@@ -223,6 +235,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                  'Suedwestfalen', 'Thueringen', 'Weser-Ems', 'Westpfalz', 'Westrhein', 'Wiesbaden']
         self.comboBox.addItems(items)
         self.comboBox.setCurrentText(self.settings.value('region', 'Alle'))
+        # self.comboBox.setItemData(self.comboBox.currentIndex(), QtGui.QColor.fromRgb(176, 234, 153), QtCore.Qt.ForegroundRole)
 
     def set_listWidget(self):
         # Sets the default values if the fume is closed without any elements in listWidget
@@ -244,6 +257,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.itemSelection_changed()
         self.current_selection = [x for x in self.listWidget.selectedItems()]  # for restoring selection
+
+    def set_timeEditNow(self):
+        now = datetime.datetime.now()
+        self.dateEdit_3.setDate(QtCore.QDate(now.year, now.month, now.day))
+        self.dateEdit_4.setDate(QtCore.QDate(now.year, now.month, now.day))
+
 
     def get_filterString(self):
         # Only join not empty filter strings
@@ -278,6 +297,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.settings.setValue('mainwindow/size', self.size())
         self.settings.setValue('mainwindow/pos', self.pos())
 
+        self.settings.setValue('menubar/date/range', self.actionZeitraum.isChecked())
+        self.settings.setValue('menubar/date/day', self.actionZeitpunkt.isChecked())
+
         self.settings.setValue('date_from_calendar', self.dateEdit_3.date())
         self.settings.setValue('date_to_calendar', self.dateEdit_4.date())
         self.settings.setValue('filter_calendar', [x.text() for x in self.listWidget.selectedItems()])
@@ -294,6 +316,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.move(self.settings.value('mainwindow/pos'))
         except:
             pass
+
+        self.actionZeitraum.setChecked(self.settings.value('menubar/date/range', True))
+        self.actionZeitpunkt.setChecked(self.settings.value('menubar/date/day', False))
 
         now = datetime.datetime.now()
         self.dateEdit_3.setDate(self.settings.value('date_from_calendar', QtCore.QDate(now.year, now.month, now.day)))
@@ -329,22 +354,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     @QtCore.pyqtSlot()
     def date_changed(self):
         date_from = self.dateEdit_3.date()
-        date_to = self.dateEdit_4.date()
 
-        if date_from > date_to:
-            date_to = date_from
-            self.dateEdit_4.setDate(date_to)
-        elif date_to < date_from:
-            date_from = date_to
-            self.dateEdit_3.setDate(date_from)
+        if self.actionZeitraum.isChecked():
+            date_to = self.dateEdit_4.date()
 
-        date_from_str = date_from.toString("yyyy-MM-dd")
-        date_to_str = date_to.addDays(1).toString("yyyy-MM-dd")  # Upper limit exclusive in BETWEEN statement
+            if date_from > date_to:
+                date_to = date_from
+                self.dateEdit_4.setDate(date_to)
+            elif date_to < date_from:
+                date_from = date_to
+                self.dateEdit_3.setDate(date_from)
 
-        self.dateFilterString = 'match_date BETWEEN "%s" AND "%s"' % (date_from_str, date_to_str)
+            date_from_str = date_from.toString("yyyy-MM-dd")
+            date_to_str = date_to.addDays(1).toString("yyyy-MM-dd")  # Upper limit exclusive in BETWEEN statement
+
+            self.dateFilterString = 'match_date BETWEEN "%s" AND "%s"' % (date_from_str, date_to_str)
+        else:
+            date_from_str = date_from.toString("yyyy-MM-dd")
+            self.dateFilterString = 'match_date LIKE "%s%%"' % (date_from_str)
+
         self.sqlmodel_calendar.setFilter(self.get_filterString())
         self.sqlmodel_calendar.select()
-        # self.tableView_2.resizeColumnsToContents()
+        self.tableView.resizeColumnsToContents()
 
     @QtCore.pyqtSlot(str)
     def lineEdit_changed(self, text):
@@ -413,6 +444,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if self.sqlmodel_calendar.rowCount() > 0:
             self.tableView.resizeColumnsToContents()
         self.statusBarLabel_1.setText('%s Mannschaften / %s Spiele' % (countTeams, self.sqlmodel_calendar.rowCount()))
+
+    @QtCore.pyqtSlot()
+    def datePeriodMenu_changed(self):
+        if self.actionZeitraum.isChecked():
+            # Range
+            self.label_2.setText('Vom:')
+            self.label_4.setVisible(True)
+            self.dateEdit_4.setVisible(True)
+
+        elif self.actionZeitpunkt.isChecked():
+            # Day
+            self.label_2.setText('Am:')
+            self.label_4.setVisible(False)
+            self.dateEdit_4.setVisible(False)
+
+        self.date_changed()
 
     @QtCore.pyqtSlot()
     def restoreSelection(self):
