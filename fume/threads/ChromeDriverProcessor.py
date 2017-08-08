@@ -111,6 +111,8 @@ class ChromeDriverProcessor(QtCore.QThread):
         try:
             self.process = subprocess.Popen([cdpath, '--port=9515'], **self.subprocess_args(False))
             self.process.wait()
-            self.loggerSignal.emit("Chrome startet successfully")
+            # process does not wait if an error occured (e.g. port not available..)
         except Exception as e:
             self.loggerSignal.emit("Chrome Connection failed:\n" + str(e))
+
+        self.loggerSignal.emit("ChromeDriver connection failed")
