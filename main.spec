@@ -30,7 +30,7 @@ if platform == "darwin" or platform == "linux" or platform == "linux2":
     binaries = [('chromedriver', '.')]
     datas = [('db/sql_default.db', 'db/.'),
              ('bin/header_klein.png', 'bin/.'),
-             #('bin/header.png', 'bin/.'),  # for splash screen
+             ('bin/qtbase_de.qm' , 'bin/.'),
              ('bin/buttons', 'bin/buttons/.')]
     icon = 'bin/icon.icns'
 else:
@@ -42,7 +42,7 @@ else:
     binaries = [('chromedriver.exe', '.')]
     datas = [('db\\sql_default.db', 'db\\.'),
              ('bin\\header_klein.png', 'bin\\.'),
-             #('bin\\header.png', 'bin\\.'),
+             ('bin\\qtbase_de.qm', 'bin\\.'),
              ('bin\\icon.ico', 'bin\\.'),
              ('bin\\buttons\\', 'bin\\buttons\\.')]
     icon = 'bin\\icon.ico'
