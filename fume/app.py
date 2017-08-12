@@ -1,5 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# --------------------------------------------------------------------------
+# FuME FuPa Match Explorer Copyright (c) 2017 Andreas Feldl <fume@afeldl.de>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# The full license of the GNU General Public License is in the file LICENCE,
+# distributed with this software; if not, see http://www.gnu.org/licenses/.
+# --------------------------------------------------------------------------
 
 import datetime
 import os
@@ -16,8 +33,8 @@ from fume.gui.AboutDialog import AboutDialog
 from fume.gui.FilterDialog import FilterDialog
 from fume.gui.LogDialog import LogDialog
 from fume.gui.SettingsDialog import SettingsDialog
-from fume.threads.DownloadProcessor import DownloadProcessor
 from fume.threads.ChromeDriverProcessor import ChromeDriverProcessor
+from fume.threads.DownloadProcessor import DownloadProcessor
 from fume.threads.ReserveProcessor import ReserveProcessor
 from fume.ui.mainwindow import Ui_MainWindow
 
@@ -139,7 +156,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                   'rounded-adjust-button-with-plus-and-minus', 'cancel-button', 'swap-vertical-orientation-arrows']
         connections = [self.showFilterDialog, self.removeSelectedItems, self.invertSelection, self.resetSelection,
                        self.restoreSelection]
-        tooltips = ["Mannschaften hinzufügen", "Ausgewählte Mannschaften entfernen", "Auswahl umkehren", "Auswahl löschen",
+        tooltips = ["Mannschaften hinzufügen", "Ausgewählte Mannschaften entfernen", "Auswahl umkehren",
+                    "Auswahl löschen",
                     "Auswahl zurücksetzen"]
 
         for button, image, connection, tooltip in zip(buttons, images, connections, tooltips):
@@ -151,6 +169,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             )
             button.clicked.connect(connection)
             button.setToolTip(tooltip)
+
+        self.commandLinkButton_5.setVisible(False)  # currently not working properly
 
         # Other
         self.dateEdit_3.dateChanged.connect(self.date_changed)
@@ -404,7 +424,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         countTeams = 0
 
         if self.selection != []:
-            teams = [i.text() for i in self.selection if i.data(QtCore.Qt.UserRole) == region]
+            if region == 'Alle':
+                teams = [i.text() for i in self.selection]
+            else:
+                teams = [i.text() for i in self.selection if i.data(QtCore.Qt.UserRole) == region]
             teamStr = ['home = "%s"' % i for i in teams]
             teamStr = ' OR '.join(teamStr)
             countTeams = len(teams)
@@ -416,7 +439,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.sqlmodel_calendar.select()
         if self.sqlmodel_calendar.rowCount() > 0:
             self.tableView.resizeColumnsToContents()
-        self.statusBarLabel_1.setText('%s Mannschaften / %s Spiele' % (countTeams, self.sqlmodel_calendar.rowCount()))
+
+        countMatches = self.sqlmodel_calendar.rowCount()
+        if countMatches == 256:
+            countMatches = '\u221e'
+        self.statusBarLabel_1.setText('%s Mannschaften / %s Spiele' % (countTeams, countMatches))
 
     @QtCore.pyqtSlot()
     def datePeriodMenu_changed(self):
@@ -433,6 +460,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.dateEdit_4.setVisible(False)
 
         self.date_changed()
+        self.itemSelection_changed()
 
     @QtCore.pyqtSlot()
     def restoreSelection(self):
