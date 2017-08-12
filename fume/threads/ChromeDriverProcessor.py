@@ -40,6 +40,8 @@ class ChromeDriverProcessor(QtCore.QThread):
         #                           **subprocess_args(False))
         #
         #
+        shell = False
+
         # The following is true only on Windows.
         if hasattr(subprocess, 'STARTUPINFO'):
             # On Windows, subprocess calls will pop up a command window by default
@@ -62,11 +64,10 @@ class ChromeDriverProcessor(QtCore.QThread):
                 # This is not needed for macOS or .exe
                 # Maybe this will be fixed later...
                 shell = True
-                print("shell is set to true")
+                print("shell is set to true, please kill chromedriver after closing FuME")
         else:
             si = None
             env = None
-            shell = False
 
         # ``subprocess.check_output`` doesn't allow specifying ``stdout``::
         #
@@ -109,7 +110,7 @@ class ChromeDriverProcessor(QtCore.QThread):
         cdpath = self.get_pathToTemp("chromedriver")
 
         try:
-            self.process = subprocess.Popen([cdpath, '--port=9515'], **self.subprocess_args(False))
+            self.process = subprocess.Popen([cdpath, '--port=9515', '--silent'], **self.subprocess_args(True))
             self.process.wait()
             # process does not wait if an error occured (e.g. port not available..)
         except Exception as e:

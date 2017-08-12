@@ -112,5 +112,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
                                            QtWidgets.qApp.tr("Alle Einstellungen werden gelöscht "
                                                              "und das Programm beendet"),
                                            QtWidgets.QMessageBox.Ok)
+
+            #sys.exit(1)
+            self.parent().close()
             self.settings.clear()
-            sys.exit(1)
