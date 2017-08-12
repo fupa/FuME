@@ -313,14 +313,6 @@
      <height>22</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuSettings">
-    <property name="title">
-     <string>Einstellungen</string>
-    </property>
-    <addaction name="actionPreferences"/>
-    <addaction name="actionAbout"/>
-    <addaction name="actionQuit"/>
-   </widget>
    <widget class="QMenu" name="menuDatei">
     <property name="title">
      <string>&amp;Datei</string>
@@ -330,13 +322,7 @@
     <addaction name="actionEinstellungen"/>
     <addaction name="actionLog"/>
     <addaction name="separator"/>
-    <addaction name="actionSchlie_en"/>
-   </widget>
-   <widget class="QMenu" name="menuAblage">
-    <property name="title">
-     <string>Ablage</string>
-    </property>
-    <addaction name="actionLog_2"/>
+    <addaction name="actionBeenden"/>
    </widget>
    <widget class="QMenu" name="menuAnsicht">
     <property name="title">
@@ -353,26 +339,9 @@
     </widget>
     <addaction name="menuDatum"/>
    </widget>
-   <addaction name="menuSettings"/>
    <addaction name="menuDatei"/>
-   <addaction name="menuAblage"/>
    <addaction name="menuAnsicht"/>
   </widget>
-  <action name="actionPreferences">
-   <property name="text">
-    <string>preferences</string>
-   </property>
-  </action>
-  <action name="actionAbout">
-   <property name="text">
-    <string>about</string>
-   </property>
-  </action>
-  <action name="actionQuit">
-   <property name="text">
-    <string>quit</string>
-   </property>
-  </action>
   <action name="actionUeber">
    <property name="text">
     <string>Über FuME</string>
@@ -384,16 +353,6 @@
    </property>
   </action>
   <action name="actionLog">
-   <property name="text">
-    <string>Log anzeigen</string>
-   </property>
-  </action>
-  <action name="actionSchlie_en">
-   <property name="text">
-    <string>Schließen</string>
-   </property>
-  </action>
-  <action name="actionLog_2">
    <property name="text">
     <string>Log anzeigen</string>
    </property>
@@ -417,6 +376,11 @@
   <action name="actionHeute">
    <property name="text">
     <string>heute</string>
+   </property>
+  </action>
+  <action name="actionBeenden">
+   <property name="text">
+    <string>Beenden</string>
    </property>
   </action>
  </widget>

@@ -115,47 +115,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.statusBar.addPermanentWidget(self.statusBarLabel_1, 0)
 
     def set_menuBar(self):
-        # macOS
-        self.actionPreferences.triggered.connect(self.settingsDialog.show)
-        self.actionAbout.triggered.connect(self.aboutDialog.show)
-        self.actionQuit.triggered.connect(self.close)
-
-        self.actionLog_2.triggered.connect(self.logDialog.show)
-
-        # Windows
         self.actionUeber.triggered.connect(self.aboutDialog.show)
         self.actionEinstellungen.triggered.connect(self.settingsDialog.show)
         self.actionLog.triggered.connect(self.logDialog.show)
-        self.actionSchlie_en.triggered.connect(self.close)
-
-        # both
+        self.actionBeenden.triggered.connect(self.close)
         self.actionHeute.triggered.connect(self.set_timeEditNow)
 
-        # Date -> Range
         dateRangeGroup = QtWidgets.QActionGroup(self)
         dateRangeGroup.addAction(self.actionZeitpunkt)
         dateRangeGroup.addAction(self.actionZeitraum)
-
-        self.actionZeitraum.changed.connect(self.datePeriodMenu_changed)
-        self.actionZeitpunkt.changed.connect(self.datePeriodMenu_changed)
-
-        if sys.platform == "win32":
-            # disable mac-specific menus
-            self.menuSettings.menuAction().setVisible(False)
-            self.menuAblage.menuAction().setVisible(False)
-        else:
-            # disable windows-specific menus
-            self.menuDatei.menuAction().setVisible(False)
+        dateRangeGroup.triggered.connect(self.datePeriodMenu_changed)
 
     def set_connections(self):
         # Push Buttons
-        # self.pushButton.clicked.connect(self.showFilterDialog)
-        # self.pushButton_2.clicked.connect(self.invertSelection)
-        # self.pushButton_3.clicked.connect(self.logDialog.show)
-        # self.pushButton_4.clicked.connect(self.settingsDialog.show)
         self.pushButton_5.clicked.connect(self.download_match)
-        # self.pushButton_9.clicked.connect(self.listWidget.selectionModel().clearSelection)
-        # self.pushButton_10.clicked.connect(self.restoreSelection)
         self.pushButton_11.clicked.connect(self.reserve_match)
 
         # Command Link Buttons
@@ -166,7 +139,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                   'rounded-adjust-button-with-plus-and-minus', 'cancel-button', 'swap-vertical-orientation-arrows']
         connections = [self.showFilterDialog, self.removeSelectedItems, self.invertSelection, self.resetSelection,
                        self.restoreSelection]
-        tooltips = ["Auswahl hinzufügen", "Auswahl entfernen", "Auswahl umkehren", "Auswahl löschen",
+        tooltips = ["Mannschaften hinzufügen", "Ausgewählte Mannschaften entfernen", "Auswahl umkehren", "Auswahl löschen",
                     "Auswahl zurücksetzen"]
 
         for button, image, connection, tooltip in zip(buttons, images, connections, tooltips):
@@ -263,7 +236,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.dateEdit_3.setDate(QtCore.QDate(now.year, now.month, now.day))
         self.dateEdit_4.setDate(QtCore.QDate(now.year, now.month, now.day))
 
-
     def get_filterString(self):
         # Only join not empty filter strings
         str = ' AND '.join(filter(None, [self.dateFilterString, self.matchFilterString, self.regionFilterString]))
@@ -317,8 +289,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         except:
             pass
 
-        self.actionZeitraum.setChecked(self.settings.value('menubar/date/range', True))
-        self.actionZeitpunkt.setChecked(self.settings.value('menubar/date/day', False))
+        self.actionZeitraum.setChecked(self.settings.value('menubar/date/range', True, type=bool))
+        self.actionZeitpunkt.setChecked(self.settings.value('menubar/date/day', False, type=bool))
 
         now = datetime.datetime.now()
         self.dateEdit_3.setDate(self.settings.value('date_from_calendar', QtCore.QDate(now.year, now.month, now.day)))
@@ -432,9 +404,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         countTeams = 0
 
         if self.selection != []:
-            teamStr = ['home = "%s"' % i.text() for i in self.selection if i.data(QtCore.Qt.UserRole) == region]
+            teams = [i.text() for i in self.selection if i.data(QtCore.Qt.UserRole) == region]
+            teamStr = ['home = "%s"' % i for i in teams]
             teamStr = ' OR '.join(teamStr)
-            countTeams = len(teamStr)
+            countTeams = len(teams)
             if teamStr != '':
                 # no selection in current region found
                 self.matchFilterString = '(' + teamStr + ')'
@@ -531,10 +504,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def download_match(self):
+        date_from = self.dateEdit_3.date()
+        if self.actionZeitraum.isChecked():
+            date_to = self.dateEdit_4.date()
+        else:
+            date_to = date_from
+
         options = {
             'region': self.comboBox.currentText(),
-            'date-from': self.dateEdit_3.date(),
-            'date-to': self.dateEdit_4.date(),
+            'date-from': date_from,
+            'date-to': date_to,
             'database-path': self.dbPath,
             'parent': self
         }
@@ -566,9 +545,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.chromeDriver.start()
 
 
-
 def run():
     app = QtWidgets.QApplication(sys.argv)
+
+    # Translates standard-buttons (Ok, Cancel) and mac menu bar to german
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    path = os.path.join(base_path, 'bin', 'qtbase_de.qm')
+    translator = QtCore.QTranslator()
+    translator.load(path)
+    app.installTranslator(translator)
+
     window = MainWindow()
     window.show()
     app.exec_()
