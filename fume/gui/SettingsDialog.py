@@ -19,9 +19,11 @@
 # --------------------------------------------------------------------------
 
 import os
+import shutil
 import sys
 import time
 
+import appdirs
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
 from selenium import webdriver
@@ -40,9 +42,13 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
         self.setModal(True)
         self.settings = QtCore.QSettings('fume', 'Match-Explorer')
 
+        self.checkBox.setChecked(self.settings.value('chrome/headless', False, bool))
+
         # Connections
         self.pushButton.clicked.connect(self.createCookie)
         self.pushButton_2.clicked.connect(self.deleteSettings)
+        self.pushButton_3.clicked.connect(self.deleteDatabase)
+        self.checkBox.stateChanged.connect(self.checkBox_changed)
         self.accepted.connect(self.lineEdit_2.clear)
 
     def waitForLoad(self, inputXPath, browser, PATIENCE_TIME):
@@ -58,12 +64,11 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
 
         return os.path.join(base_path, relative_path)
 
-    def isFrozen(self):
-        # TODO Use this
-        if getattr(sys, 'frozen', False):
-            return True
-        else:
-            return False
+    # def isFrozen(self):
+    #     if getattr(sys, 'frozen', False):
+    #         return True
+    #     else:
+    #         return False
 
     @QtCore.pyqtSlot()
     def createCookie(self):
@@ -73,7 +78,8 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
         options = webdriver.ChromeOptions()
         # waiting for Chrome 60 on Windows
         # Chrome 59 for macOS already supports headless Chrome!
-        # options.add_argument('--headless')
+        if self.settings.value('chrome/headless', False, bool):
+            options.add_argument('--headless')
 
         # https://doc.qt.io/qt-5/qmessagebox.html
         msgBox = QtWidgets.QMessageBox()
@@ -121,15 +127,38 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
     @QtCore.pyqtSlot()
     def deleteSettings(self):
         ret = QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Alle Einstellungen löschen"),
-                                             QtWidgets.qApp.tr("Willst du wirklich alle Einstellungen löschen?\n\n"
-                                                               "Drücke OK zum bestätigen und Cancel zum abbrechen."),
+                                             QtWidgets.qApp.tr("Willst du wirklich alle Einstellungen löschen? "
+                                                               "Alle Einstellungen gehen verloren.\n\n"
+                                                               "Drücke OK um zu bestätigen und Abbrechen um zurückzukehren."),
                                              QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
         if ret == QtWidgets.QMessageBox.Ok:
             QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Alle Einstellungen löschen"),
-                                           QtWidgets.qApp.tr("Alle Einstellungen werden gelöscht "
-                                                             "und das Programm beendet"),
+                                           QtWidgets.qApp.tr("Alle Einstellungen werden gelöscht und das Programm beendet\n\n"
+                                                             "Nach dem Beenden sind alle Einstellungen entfernt."),
                                            QtWidgets.QMessageBox.Ok)
 
-            #sys.exit(1)
             self.parent().close()
             self.settings.clear()
+
+    @QtCore.pyqtSlot()
+    def deleteDatabase(self):
+        appdir = appdirs.user_data_dir('FuME', 'FuME')
+        ret = QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Datenbank löschen"),
+                                             QtWidgets.qApp.tr("Willst du wirklich die Datenbank von FuME löschen? "
+                                                               "Alle importierten Spiele gehen verloren.\n\n"
+                                                               "Drücke OK um zu bestätigen und Abbrechen um zurückzukehren."),
+                                             QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
+        if ret == QtWidgets.QMessageBox.Ok:
+            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Datenbank löschen"),
+                                           QtWidgets.qApp.tr("Die Datenbank wird gelöscht und das Programm beendet.\n\n"
+                                                             "Nach dem Beenden sind alle Spiele entfernt."),
+                                           QtWidgets.QMessageBox.Ok)
+            self.parent().close()
+            shutil.rmtree(appdir)
+
+    @QtCore.pyqtSlot(int)
+    def checkBox_changed(self, int):
+        if int:  # 1: checkBox checked
+            self.settings.setValue('chrome/headless', True)
+        else:
+            self.settings.setValue('chrome/headless', False)

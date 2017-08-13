@@ -38,6 +38,8 @@ class ReserveProcessor(QtCore.QThread):
     def __init__(self, options):
         super(ReserveProcessor, self).__init__(options['parent'])
 
+        self.settings = QtCore.QSettings('fume', 'Match-Explorer')
+
         self.selected = options['selected']
         self.cookies = options['cookie']
         self.dbPath = options['database-path']
@@ -114,7 +116,8 @@ class ReserveProcessor(QtCore.QThread):
         counter = 0
 
         options = webdriver.ChromeOptions()
-        # options.add_argument('--headless')
+        if self.settings.value('chrome/headless', False, bool):
+            options.add_argument('--headless')
 
         try:
             self.driver = Remote('http://localhost:9515', desired_capabilities=options.to_capabilities())
