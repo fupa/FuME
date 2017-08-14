@@ -318,6 +318,7 @@
      <string>&amp;Datei</string>
     </property>
     <addaction name="actionUeber"/>
+    <addaction name="actionAuf_Update_berpr_fen"/>
     <addaction name="separator"/>
     <addaction name="actionEinstellungen"/>
     <addaction name="actionLog"/>
@@ -356,6 +357,9 @@
    <property name="text">
     <string>Log anzeigen</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::ApplicationSpecificRole</enum>
+   </property>
   </action>
   <action name="actionZeitpunkt">
    <property name="checkable">
@@ -381,6 +385,14 @@
   <action name="actionBeenden">
    <property name="text">
     <string>Beenden</string>
+   </property>
+  </action>
+  <action name="actionAuf_Update_berpr_fen">
+   <property name="text">
+    <string>Auf Updates überprüfen</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::ApplicationSpecificRole</enum>
    </property>
   </action>
  </widget>

@@ -33,9 +33,11 @@ from fume.gui.AboutDialog import AboutDialog
 from fume.gui.FilterDialog import FilterDialog
 from fume.gui.LogDialog import LogDialog
 from fume.gui.SettingsDialog import SettingsDialog
+from fume.gui.UpdateDialog import UpdateDialog
 from fume.threads.ChromeDriverProcessor import ChromeDriverProcessor
 from fume.threads.DownloadProcessor import DownloadProcessor
 from fume.threads.ReserveProcessor import ReserveProcessor
+from fume.threads.UpdateProcessor import UpdateProcessor
 from fume.ui.mainwindow import Ui_MainWindow
 
 version = '1.1'
@@ -84,12 +86,12 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         if sys.platform == "win32":
             self.setWindowIcon(QtGui.QIcon(self.get_pathToTemp(['bin', 'icon.ico'])))
-        header = self.get_pathToTemp(["bin", "header_klein.png"])
-        self.label.setPixmap(QtGui.QPixmap(header))
+        self.header = self.get_pathToTemp(["bin", "header_klein.png"])
+        self.label.setPixmap(QtGui.QPixmap(self.header))
 
         self.logDialog = LogDialog(self)
         self.settingsDialog = SettingsDialog(self)
-        self.aboutDialog = AboutDialog(path=header, version=version, parent=self)
+        self.aboutDialog = AboutDialog(path=self.header, version=version, parent=self)
 
         if not self.set_database():
             sys.exit(1)
@@ -109,6 +111,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.set_listWidget()
         self.comboBox_changed()  # set region
         self.datePeriodMenu_changed()
+
+        if not self.settings.value('updates/noautoupdate', False, bool):
+            self.checkForUpdates(active=False)
 
         self.tableView.hideColumn(7)
         self.tableView.hideColumn(8)
@@ -137,6 +142,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionLog.triggered.connect(self.logDialog.show)
         self.actionBeenden.triggered.connect(self.close)
         self.actionHeute.triggered.connect(self.set_timeEditNow)
+        self.actionAuf_Update_berpr_fen.triggered.connect(self.checkForUpdates)
 
         dateRangeGroup = QtWidgets.QActionGroup(self)
         dateRangeGroup.addAction(self.actionZeitpunkt)
@@ -571,6 +577,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.chromeDriver.loggerSignal.connect(self.logDialog.add)
 
         self.chromeDriver.start()
+
+    @QtCore.pyqtSlot(dict)
+    def set_updateDialog(self, data):
+        if not self.settings.value('updates/skipthisversion/%s' % data['current'], False, bool):  # dont skip
+            if data['latest'] > data['current']:  # silent check
+                data.update({'logo': self.header})
+                self.updateDialog = UpdateDialog(parent=self, data=data)
+                self.updateDialog.show()
+            elif data['active']:  # mannually checked for updates
+                QtWidgets.QMessageBox.information(self, QtWidgets.qApp.tr("Software-Update"),
+                                                  QtWidgets.qApp.tr("Keine Updates gefunden.\n\n"
+                                                                    "FuME ist auf dem neusten Stand!"),
+                                                  QtWidgets.QMessageBox.Ok)
+            else:
+                self.logDialog.add('Auf dem neusten Stand: Version %s' % version)
+
+    @QtCore.pyqtSlot()
+    def checkForUpdates(self, active=True):
+        options = {
+            'version': version,
+            'active': active,
+            'parent': self
+        }
+        self.updateProcessor = UpdateProcessor(options)
+
+        # Connections
+        self.updateProcessor.loggerSignal.connect(self.logDialog.add)
+        self.updateProcessor.statusBarSignal.connect(self.statusBar.showMessage)
+        self.updateProcessor.updateSignal.connect(self.set_updateDialog)
+
+        self.updateProcessor.start()
 
 
 def run():

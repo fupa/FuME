@@ -29,4 +29,4 @@ class AboutDialog(QtWidgets.QDialog, Ui_Dialog):
         super(AboutDialog, self).__init__(parent)
         self.setupUi(self)
         self.label.setPixmap(QtGui.QPixmap(path))
-        self.label_3.setText('Version v%s' % version)
+        self.label_3.setText('Version %s' % version)
