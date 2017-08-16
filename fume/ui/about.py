@@ -12,7 +12,7 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.setWindowModality(QtCore.Qt.ApplicationModal)
-        Dialog.resize(450, 450)
+        Dialog.resize(450, 473)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -40,6 +40,10 @@ class Ui_Dialog(object):
         self.label_3 = QtWidgets.QLabel(Dialog)
         self.label_3.setObjectName("label_3")
         self.verticalLayout.addWidget(self.label_3, 0, QtCore.Qt.AlignHCenter)
+        self.label_5 = QtWidgets.QLabel(Dialog)
+        self.label_5.setOpenExternalLinks(True)
+        self.label_5.setObjectName("label_5")
+        self.verticalLayout.addWidget(self.label_5, 0, QtCore.Qt.AlignHCenter)
         self.textEdit = QtWidgets.QTextEdit(Dialog)
         self.textEdit.setAutoFillBackground(False)
         self.textEdit.setReadOnly(True)
@@ -65,6 +69,7 @@ class Ui_Dialog(object):
         Dialog.setWindowTitle(_translate("Dialog", "Über FuME"))
         self.label_2.setText(_translate("Dialog", "FuME - FuPa Match Explorer"))
         self.label_3.setText(_translate("Dialog", "Version"))
+        self.label_5.setText(_translate("Dialog", "<html><head/><body><p>Website: <a href=\"https://github.com/fupadev/FuME\"><span style=\" text-decoration: underline; color:#0000ff;\">www.github.com/fupadev/FuME</span></a></p></body></html>"))
         self.textEdit.setHtml(_translate("Dialog", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

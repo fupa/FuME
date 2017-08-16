@@ -318,10 +318,10 @@
      <string>&amp;Datei</string>
     </property>
     <addaction name="actionUeber"/>
+    <addaction name="action_ber_QT"/>
     <addaction name="actionAuf_Update_berpr_fen"/>
     <addaction name="separator"/>
     <addaction name="actionEinstellungen"/>
-    <addaction name="actionLog"/>
     <addaction name="separator"/>
     <addaction name="actionBeenden"/>
    </widget>
@@ -339,6 +339,8 @@
      <addaction name="actionZeitraum"/>
     </widget>
     <addaction name="menuDatum"/>
+    <addaction name="separator"/>
+    <addaction name="actionLog"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuAnsicht"/>
@@ -358,7 +360,7 @@
     <string>Log anzeigen</string>
    </property>
    <property name="menuRole">
-    <enum>QAction::ApplicationSpecificRole</enum>
+    <enum>QAction::TextHeuristicRole</enum>
    </property>
   </action>
   <action name="actionZeitpunkt">
@@ -393,6 +395,14 @@
    </property>
    <property name="menuRole">
     <enum>QAction::ApplicationSpecificRole</enum>
+   </property>
+  </action>
+  <action name="action_ber_QT">
+   <property name="text">
+    <string>Über QT</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
    </property>
   </action>
  </widget>
