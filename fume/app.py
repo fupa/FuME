@@ -30,6 +30,7 @@ from PyQt5 import QtSql
 from PyQt5 import QtWidgets
 
 from fume.gui.AboutDialog import AboutDialog
+from fume.gui.AboutQtDialog import AboutQtDialog
 from fume.gui.FilterDialog import FilterDialog
 from fume.gui.LogDialog import LogDialog
 from fume.gui.SettingsDialog import SettingsDialog
@@ -92,6 +93,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.logDialog = LogDialog(self)
         self.settingsDialog = SettingsDialog(self)
         self.aboutDialog = AboutDialog(path=self.header, version=version, parent=self)
+        self.aboutQtDialog = AboutQtDialog(self)
 
         if not self.set_database():
             sys.exit(1)
@@ -138,6 +140,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def set_menuBar(self):
         self.actionUeber.triggered.connect(self.aboutDialog.show)
+        self.action_ber_QT.triggered.connect(self.aboutQtDialog.show)
         self.actionEinstellungen.triggered.connect(self.settingsDialog.show)
         self.actionLog.triggered.connect(self.logDialog.show)
         self.actionBeenden.triggered.connect(self.close)
