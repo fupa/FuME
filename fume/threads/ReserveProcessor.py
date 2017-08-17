@@ -34,11 +34,13 @@ class ReserveProcessor(QtCore.QThread):
     loggerSignal = QtCore.pyqtSignal(str)
     statusBarSignal = QtCore.pyqtSignal(str)
     alreadyReservedSignal = QtCore.pyqtSignal(str)
+    updateGuiSignal = QtCore.pyqtSignal()
 
     def __init__(self, options):
         super(ReserveProcessor, self).__init__(options['parent'])
 
         self.settings = QtCore.QSettings('fume', 'Match-Explorer')
+        self.options = options
 
         self.selected = options['selected']
         self.cookies = options['cookie']
@@ -88,8 +90,24 @@ class ReserveProcessor(QtCore.QThread):
                     # match can be reserved
                     return match, None
 
+    def insertMafoId(self, match):
+        connection = sqlite3.connect(self.dbPath)
+        cursor = connection.cursor()
+
+        selectStr = """SELECT mafo_id FROM calendar WHERE match_id = "{match_id}";"""
+        sql_command = selectStr.format(match_id=match['match_id'])
+        cursor.execute(sql_command)
+
+        mafo_id = cursor.fetchone()[0]
+
+        connection.commit()
+        connection.close()
+
+        match['mafo_id'] = mafo_id
+        return match
+
     def delete(self, match):
-        print('delete', match['mafo_id'])
+        self.loggerSignal.emit('Lösche Reservierung von %s - %s #%s' % (match['home'], match['guest'], match['match_id']))
         self.driver.request("GET", self.baseUrl + '&mafo_id=%s&act=del' % match['mafo_id'])
 
     def markRowAsReserved(self, match, val):
@@ -102,6 +120,7 @@ class ReserveProcessor(QtCore.QThread):
 
         connection.commit()
         connection.close()
+        self.updateGuiSignal.emit()
 
     def get_pathToTemp(self, relative_path):
         try:
@@ -112,6 +131,12 @@ class ReserveProcessor(QtCore.QThread):
         return os.path.join(base_path, relative_path)
 
     def run(self):
+        if self.options['what'] == 'reserve':
+            self.runReserve()
+        elif self.options['what'] == 'delete':
+            self.runDelete()
+
+    def runReserve(self):
         self.statusBarSignal.emit("Reserviere Spiele...")
         counter = 0
 
@@ -171,3 +196,34 @@ class ReserveProcessor(QtCore.QThread):
         self.loggerSignal.emit('%s Spiele erfolgreich reserviert' % (counter - len(alreadyReserved)))
         self.loggerSignal.emit('%s davon waren reserviert' % len(alreadyReserved))
         self.statusBarSignal.emit("Bereit")
+
+    def runDelete(self):
+        self.statusBarSignal.emit("Lösche Reservierungen...")
+        options = webdriver.ChromeOptions()
+        if self.settings.value('chrome/headless', False, bool):
+            options.add_argument('--headless')
+
+        try:
+            self.driver = Remote('http://localhost:9515', desired_capabilities=options.to_capabilities())
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keine Verbindung zu Google Chrome!"),
+                                           QtWidgets.qApp.tr(
+                                               "Es konnte keine Verbindung zu Google Chrome hergestellt werden! "
+                                               "Bitte stelle sicher, dass alle Systemvoraussetzungen erfüllt sind.\n\n"
+                                               "Fehler:\n" + str(e)),
+                                           QtWidgets.QMessageBox.Cancel)
+            return
+
+        self.driver.get(self.baseUrl)
+
+        for cookie in self.cookies:
+            self.driver.add_cookie(cookie)
+
+        for match in self.selected:
+            match = self.insertMafoId(match)
+            self.delete(match)
+            self.markRowAsReserved(match, 0)
+
+        self.loggerSignal.emit('%s Reservierungen erfolgreich gelöscht.' % len(self.selected) )
+
+        self.driver.close()

@@ -135,8 +135,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.statusBar.showMessage("Willkommen!")
 
         # Permanent labels
+        self.statusBarLabel_2 = QtWidgets.QLabel(self.statusBar)
+        self.statusBar.addPermanentWidget(self.statusBarLabel_2)
+        self.statusBarLabel_2.setText("   ")
+        self.statusBarLabel_2.setStyleSheet("QLabel { background-color : #b0ea99;}")
+
         self.statusBarLabel_1 = QtWidgets.QLabel(self.statusBar)
-        self.statusBar.addPermanentWidget(self.statusBarLabel_1, 0)
+        self.statusBar.addPermanentWidget(self.statusBarLabel_1)
 
     def set_menuBar(self):
         self.actionUeber.triggered.connect(self.aboutDialog.show)
@@ -146,6 +151,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionBeenden.triggered.connect(self.close)
         self.actionHeute.triggered.connect(self.set_timeEditNow)
         self.actionAuf_Update_berpr_fen.triggered.connect(self.checkForUpdates)
+        self.actionImportieren.triggered.connect(self.download_match)
+        self.actionHinzuf_gen_reservieren.triggered.connect(self.reserve_match)
+        self.actionL_schen.triggered.connect(self.deleteReservation)
 
         dateRangeGroup = QtWidgets.QActionGroup(self)
         dateRangeGroup.addAction(self.actionZeitpunkt)
@@ -284,6 +292,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             return os.path.join(base_path, *relative_path).replace("\\", "/")
 
         return os.path.join(base_path, *relative_path)
+
+    def get_selectedMatches(self):
+        selected = []
+        indexes = self.tableView.selectedIndexes()
+
+        if indexes == []:
+            QtWidgets.QMessageBox.information(self, QtWidgets.qApp.tr("Keine Spiele ausgewählt"),
+                                              QtWidgets.qApp.tr("Du hast kein Spiel ausgewählt.\n\n"
+                                                                "Bitte markiere ein oder mehrere Zeilen "
+                                                                "in der Spielübersicht und probiere es erneut."),
+                                              QtWidgets.QMessageBox.Ok)
+            return None
+        else:
+            for index in sorted(indexes):
+                match_id = self.tableView.model().record(index.row()).value('match_id')
+                match_date = self.tableView.model().record(index.row()).value('match_date')
+                home = self.tableView.model().record(index.row()).value('home')
+                guest = self.tableView.model().record(index.row()).value('guest')
+                selected.append({'match_id': match_id, 'match_date': match_date, 'home': home, 'guest': guest})
+            return selected
+
+    def get_cookies(self):
+        cookies = self.settings.value('cookie', '')
+        if cookies == '':
+            QtWidgets.QMessageBox.information(self, QtWidgets.qApp.tr("Cookies"),
+                                              QtWidgets.qApp.tr("Keine Cookies vorhanden.\n\n"
+                                                                "Erstelle jetzt deine Cookies in den Einstellungen"),
+                                              QtWidgets.QMessageBox.Ok)
+            return None
+        else:
+            return cookies
 
     def hideAll(self):
         for i in range(0, self.listWidget.count()):
@@ -496,24 +535,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def reserve_match(self):
-        selected = []
-        indexes = self.tableView.selectedIndexes()
-        for index in sorted(indexes):
-            match_id = self.tableView.model().record(index.row()).value('match_id')
-            match_date = self.tableView.model().record(index.row()).value('match_date')
-            home = self.tableView.model().record(index.row()).value('home')
-            guest = self.tableView.model().record(index.row()).value('guest')
-            selected.append({'match_id': match_id, 'match_date': match_date, 'home': home, 'guest': guest})
+        selected = self.get_selectedMatches()
+        cookies = self.get_cookies()
 
-        cookies = self.settings.value('cookie', '')
-        if cookies == '':
-            QtWidgets.QMessageBox.information(self, QtWidgets.qApp.tr("Cookies"),
-                                              QtWidgets.qApp.tr("Keine Cookies vorhanden.\n\n"
-                                                                "Erstelle jetzt deine Cookies in den Einstellungen"),
-                                              QtWidgets.QMessageBox.Ok)
+        if selected == None or cookies == None:
             return
 
         options = {
+            'what': 'reserve',
             'cookie': cookies,
             'selected': selected,
             'database-path': self.dbPath,
@@ -527,6 +556,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.reserveProcess.alreadyReservedSignal.connect(self.alreadyReservedMessageBox)
         self.reserveProcess.finished.connect(self.sqlmodel_calendar.select)
         self.reserveProcess.finished.connect(self.tableView.resizeColumnsToContents)
+        self.reserveProcess.updateGuiSignal.connect(self.sqlmodel_calendar.select)
 
         self.reserveProcess.start()
 
@@ -611,6 +641,33 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.updateProcessor.updateSignal.connect(self.set_updateDialog)
 
         self.updateProcessor.start()
+
+    @QtCore.pyqtSlot()
+    def deleteReservation(self):
+        selected = self.get_selectedMatches()
+        cookies = self.get_cookies()
+
+        if selected == None or cookies == None:
+            return
+
+        options = {
+            'what': 'delete',
+            'cookie': cookies,
+            'selected': selected,
+            'database-path': self.dbPath,
+            'parent': self
+        }
+        self.reserveProcess = ReserveProcessor(options)
+
+        # Connections
+        self.reserveProcess.loggerSignal.connect(self.logDialog.add)
+        self.reserveProcess.statusBarSignal.connect(self.statusBar.showMessage)
+        self.reserveProcess.alreadyReservedSignal.connect(self.alreadyReservedMessageBox)
+        self.reserveProcess.finished.connect(self.sqlmodel_calendar.select)
+        self.reserveProcess.finished.connect(self.tableView.resizeColumnsToContents)
+        self.reserveProcess.updateGuiSignal.connect(self.sqlmodel_calendar.select)
+
+        self.reserveProcess.start()
 
 
 def run():
