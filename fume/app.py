@@ -107,12 +107,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.matchFilterString = ''
         self.regionFilterString = ''
         self.dateFilterString = ''
+        self.resFilterString = ''
 
         self.set_comboBoxItems()
         self.date_changed()  # set date-range
         self.set_listWidget()
         self.comboBox_changed()  # set region
         self.datePeriodMenu_changed()
+        self.viewMenu_changed()
 
         if not self.settings.value('updates/noautoupdate', False, bool):
             self.checkForUpdates(active=False)
@@ -135,11 +137,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.statusBar.showMessage("Willkommen!")
 
         # Permanent labels
-        self.statusBarLabel_2 = QtWidgets.QLabel(self.statusBar)
-        self.statusBar.addPermanentWidget(self.statusBarLabel_2)
-        self.statusBarLabel_2.setText("   ")
-        self.statusBarLabel_2.setStyleSheet("QLabel { background-color : #b0ea99;}")
-
         self.statusBarLabel_1 = QtWidgets.QLabel(self.statusBar)
         self.statusBar.addPermanentWidget(self.statusBarLabel_1)
 
@@ -159,6 +156,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         dateRangeGroup.addAction(self.actionZeitpunkt)
         dateRangeGroup.addAction(self.actionZeitraum)
         dateRangeGroup.triggered.connect(self.datePeriodMenu_changed)
+
+        viewGroup = QtWidgets.QActionGroup(self)
+        viewGroup.addAction(self.actionAnsichtSpiele)
+        viewGroup.addAction(self.actionAnsichtReservierungen)
+        viewGroup.triggered.connect(self.viewMenu_changed)
 
     def set_connections(self):
         # Push Buttons
@@ -275,7 +277,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def get_filterString(self):
         # Only join not empty filter strings
-        str = ' AND '.join(filter(None, [self.dateFilterString, self.matchFilterString, self.regionFilterString]))
+        str = ' AND '.join(filter(None, [self.dateFilterString, self.matchFilterString, self.regionFilterString,
+                                         self.resFilterString]))
         # print(str)
         return str
 
@@ -508,6 +511,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.dateEdit_4.setVisible(False)
 
         self.date_changed()
+        self.itemSelection_changed()
+
+    @QtCore.pyqtSlot()
+    def viewMenu_changed(self):
+        if self.actionAnsichtSpiele.isChecked():
+            # Show matches
+            self.label_5.setVisible(False)
+            self.label_6.setVisible(False)
+            self.resFilterString = ''
+        elif self.actionAnsichtReservierungen.isChecked():
+            # Show reservations
+            self.label_5.setVisible(True)
+            self.label_6.setVisible(True)
+            self.resFilterString = 'reserved <> 0'
         self.itemSelection_changed()
 
     @QtCore.pyqtSlot()
