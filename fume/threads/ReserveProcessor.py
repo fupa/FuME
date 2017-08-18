@@ -166,10 +166,12 @@ class ReserveProcessor(QtCore.QThread):
             try:
                 matchNew, ph = self.reserve(match)
             except Exception as e:
-                self.loggerSignal.emit("Fehler beim reservieren von %s" % match['match_id'])
-                self.driver.close()
-                print(e)
-                return
+                self.loggerSignal.emit("Fehler beim reservieren von %s - %s #%d. "
+                                       "Das Spiel ist nicht mehr in FuPa eingetragen..." % (match['home'], match['guest'], match['match_id']))
+                # TODO mark as not reserved (mafo_id missing)
+                #self.driver.close()
+                print('Fehler:', str(e))
+                continue
             match = matchNew
             if ph != None:
                 alreadyReserved.append([match, ph])
