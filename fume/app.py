@@ -31,6 +31,7 @@ from PyQt5 import QtWidgets
 
 from fume.gui.AboutDialog import AboutDialog
 from fume.gui.AboutQtDialog import AboutQtDialog
+from fume.gui.EditDialog import EditDialog
 from fume.gui.FilterDialog import FilterDialog
 from fume.gui.LogDialog import LogDialog
 from fume.gui.SettingsDialog import SettingsDialog
@@ -82,6 +83,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
+        #self.checkBox_2.setVisible(False)
+
         self.set_statusBar()
         self.read_settings()
 
@@ -164,6 +167,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def set_connections(self):
         # Push Buttons
+        self.pushButton.clicked.connect(self.showEditDialog)
         self.pushButton_5.clicked.connect(self.download_match)
         self.pushButton_11.clicked.connect(self.reserve_match)
 
@@ -303,7 +307,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if indexes == []:
             QtWidgets.QMessageBox.information(self, QtWidgets.qApp.tr("Keine Spiele ausgewählt"),
                                               QtWidgets.qApp.tr("Du hast kein Spiel ausgewählt.\n\n"
-                                                                "Bitte markiere ein oder mehrere Zeilen "
+                                                                "Bitte markiere eine oder mehrere Zeilen "
                                                                 "in der Spielübersicht und probiere es erneut."),
                                               QtWidgets.QMessageBox.Ok)
             return None
@@ -393,6 +397,20 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         else:
             self.filterWindow = FilterDialog(self)
             self.filterWindow.show()
+
+    @QtCore.pyqtSlot()
+    def showEditDialog(self):
+        selected = self.get_selectedMatches()
+        if selected == None:
+            return
+        elif len(selected) == 1:
+            self.editDialog = EditDialog(parent=self, selected=selected[0], dbPath=self.dbPath)
+            self.editDialog.show()
+        else:
+            QtWidgets.QMessageBox.warning(self, QtWidgets.qApp.tr("Nur ein Spiel wählen"),
+                                          QtWidgets.qApp.tr("Bitte nur ein Spiel auswhählen.\n\n"
+                                                            "Ok drücken um fortzufahren."),
+                                          QtWidgets.QMessageBox.Ok)
 
     @QtCore.pyqtSlot()
     def date_changed(self):
