@@ -21,28 +21,28 @@
     <item row="3" column="0">
      <widget class="QPushButton" name="pushButton">
       <property name="text">
-       <string>ändern</string>
+       <string>Eintrag ändern</string>
       </property>
      </widget>
     </item>
     <item row="2" column="1">
      <widget class="QPushButton" name="pushButton_11">
       <property name="text">
-       <string>reservieren</string>
+       <string>Spiele reservieren</string>
       </property>
      </widget>
     </item>
     <item row="2" column="0">
      <widget class="QPushButton" name="pushButton_5">
       <property name="text">
-       <string>importieren</string>
+       <string>Spiele importieren</string>
       </property>
      </widget>
     </item>
     <item row="3" column="1">
      <widget class="QPushButton" name="pushButton_2">
       <property name="text">
-       <string>hochladen</string>
+       <string>Galerie hochladen</string>
       </property>
      </widget>
     </item>
@@ -373,18 +373,20 @@
     <addaction name="actionAnsichtSpiele"/>
     <addaction name="actionAnsichtReservierungen"/>
     <addaction name="separator"/>
+    <addaction name="actionSpielbericht_anzeigen"/>
     <addaction name="actionLog"/>
    </widget>
    <widget class="QMenu" name="menuBearbeiten">
     <property name="title">
      <string>Bearbeiten</string>
     </property>
-    <addaction name="actionSpiele"/>
     <addaction name="actionImportieren"/>
+    <addaction name="actionBearbeiten"/>
     <addaction name="separator"/>
-    <addaction name="actionReservierung"/>
     <addaction name="actionHinzuf_gen_reservieren"/>
     <addaction name="actionL_schen"/>
+    <addaction name="separator"/>
+    <addaction name="actionGalerie_hochladen"/>
    </widget>
    <addaction name="menuDatei"/>
    <addaction name="menuBearbeiten"/>
@@ -455,12 +457,12 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Spiel</string>
+    <string>Spiele</string>
    </property>
   </action>
   <action name="actionImportieren">
    <property name="text">
-    <string>importieren (aus FuPa)</string>
+    <string>Spiele importieren (aus FuPa)</string>
    </property>
   </action>
   <action name="actionReservierung">
@@ -468,17 +470,17 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string>Reservierung</string>
+    <string>Reservierungen</string>
    </property>
   </action>
   <action name="actionHinzuf_gen_reservieren">
    <property name="text">
-    <string>hinzufügen (reservieren)</string>
+    <string>Reservierung hinzufügen (reservieren)</string>
    </property>
   </action>
   <action name="actionL_schen">
    <property name="text">
-    <string>löschen</string>
+    <string>Reservierung löschen</string>
    </property>
   </action>
   <action name="actionAnsichtSpiele">
@@ -498,6 +500,21 @@
    </property>
    <property name="text">
     <string>Reservierungen</string>
+   </property>
+  </action>
+  <action name="actionBearbeiten">
+   <property name="text">
+    <string>Eintrag bearbeiten</string>
+   </property>
+  </action>
+  <action name="actionGalerie_hochladen">
+   <property name="text">
+    <string>Galerie hochladen</string>
+   </property>
+  </action>
+  <action name="actionSpielbericht_anzeigen">
+   <property name="text">
+    <string>Spielbericht anzeigen</string>
    </property>
   </action>
  </widget>

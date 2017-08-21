@@ -22,6 +22,7 @@ import datetime
 import os
 import shutil
 import sys
+import webbrowser
 
 import appdirs
 from PyQt5 import QtCore
@@ -33,6 +34,7 @@ from fume.gui.AboutDialog import AboutDialog
 from fume.gui.AboutQtDialog import AboutQtDialog
 from fume.gui.EditDialog import EditDialog
 from fume.gui.FilterDialog import FilterDialog
+from fume.gui.GaleryDialog import GaleryDialog
 from fume.gui.LogDialog import LogDialog
 from fume.gui.SettingsDialog import SettingsDialog
 from fume.gui.UpdateDialog import UpdateDialog
@@ -83,7 +85,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-        #self.checkBox_2.setVisible(False)
+        # self.checkBox_2.setVisible(False)
 
         self.set_statusBar()
         self.read_settings()
@@ -154,6 +156,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionImportieren.triggered.connect(self.download_match)
         self.actionHinzuf_gen_reservieren.triggered.connect(self.reserve_match)
         self.actionL_schen.triggered.connect(self.deleteReservation)
+        self.actionGalerie_hochladen.triggered.connect(self.showGaleryDialog)
+        self.actionBearbeiten.triggered.connect(self.showEditDialog)
+        self.actionSpielbericht_anzeigen.triggered.connect(self.openGameReport)
 
         dateRangeGroup = QtWidgets.QActionGroup(self)
         dateRangeGroup.addAction(self.actionZeitpunkt)
@@ -168,6 +173,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def set_connections(self):
         # Push Buttons
         self.pushButton.clicked.connect(self.showEditDialog)
+        self.pushButton_2.clicked.connect(self.showGaleryDialog)
         self.pushButton_5.clicked.connect(self.download_match)
         self.pushButton_11.clicked.connect(self.reserve_match)
 
@@ -413,6 +419,21 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                                           QtWidgets.QMessageBox.Ok)
 
     @QtCore.pyqtSlot()
+    def showGaleryDialog(self):
+        # TODO Multiple upload support
+        selected = self.get_selectedMatches()
+        if selected == None:
+            return
+        elif len(selected) == 1:
+            self.galeryDialog = GaleryDialog(parent=self, cookies=self.get_cookies(), match=selected[0])
+            self.galeryDialog.show()
+        else:
+            QtWidgets.QMessageBox.warning(self, QtWidgets.qApp.tr("Nur ein Spiel wählen"),
+                                          QtWidgets.qApp.tr("Bitte nur ein Spiel auswhählen.\n\n"
+                                                            "Ok drücken um fortzufahren."),
+                                          QtWidgets.QMessageBox.Ok)
+
+    @QtCore.pyqtSlot()
     def date_changed(self):
         date_from = self.dateEdit_3.date()
 
@@ -518,7 +539,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def datePeriodMenu_changed(self):
         if self.actionZeitraum.isChecked():
             # Range
-            self.label_2.setText('Vom:')
+            self.label_2.setText('Von:')
             self.label_4.setVisible(True)
             self.dateEdit_4.setVisible(True)
 
@@ -703,6 +724,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.reserveProcess.updateGuiSignal.connect(self.sqlmodel_calendar.select)
 
         self.reserveProcess.start()
+
+    @QtCore.pyqtSlot()
+    def openGameReport(self):
+        selected = self.get_selectedMatches()
+        if selected:
+            for match in selected:
+                webbrowser.open_new_tab('https://www.fupa.net/spielberichte/xxx-xxx-xxx-%d.html' % match['match_id'])
 
 
 def run():
