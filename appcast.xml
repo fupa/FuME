@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fume>
+    <latest>
+        <version type="int">1.1</version>
+        <changelog>https://raw.githubusercontent.com/fupadev/FuME/master/CHANGELOG.md</changelog>
+        <windows type="string">https://github.com/fupadev/FuME/releases/download/v1.1/FuME.exe</windows>
+        <mac type="string">https://github.com/fupadev/FuME/releases/download/v1.1/FuME.app</mac>
+    </latest>
+</fume>
