@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>487</width>
+    <width>471</width>
     <height>410</height>
    </rect>
   </property>
@@ -115,7 +115,10 @@
          <string>Browser Fenster verstecken</string>
         </property>
         <property name="text">
-         <string>Google Chrome headless (macOS: Chrome 59/Windows: Chrome 60)</string>
+         <string>Google Chrome Headless Mode (ab Chrome 60)</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
         </property>
        </widget>
       </item>

@@ -42,7 +42,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
         self.setModal(True)
         self.settings = QtCore.QSettings('fume', 'Match-Explorer')
 
-        self.checkBox.setChecked(self.settings.value('chrome/headless', False, bool))
+        self.checkBox.setChecked(self.settings.value('chrome/headless', True, bool))
 
         # Connections
         self.pushButton.clicked.connect(self.createCookie)
@@ -78,7 +78,7 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
         options = webdriver.ChromeOptions()
         # waiting for Chrome 60 on Windows
         # Chrome 59 for macOS already supports headless Chrome!
-        if self.settings.value('chrome/headless', False, bool):
+        if self.settings.value('chrome/headless', True, bool):
             options.add_argument('--headless')
 
         # https://doc.qt.io/qt-5/qmessagebox.html

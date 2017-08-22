@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Settings(object):
     def setupUi(self, Settings):
         Settings.setObjectName("Settings")
-        Settings.resize(487, 410)
+        Settings.resize(471, 410)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(Settings)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.groupBox = QtWidgets.QGroupBox(Settings)
@@ -55,6 +55,7 @@ class Ui_Settings(object):
         self.pushButton_3.setObjectName("pushButton_3")
         self.verticalLayout_3.addWidget(self.pushButton_3)
         self.checkBox = QtWidgets.QCheckBox(self.groupBox_2)
+        self.checkBox.setChecked(True)
         self.checkBox.setObjectName("checkBox")
         self.verticalLayout_3.addWidget(self.checkBox)
         self.verticalLayout_2.addWidget(self.groupBox_2)
@@ -82,5 +83,5 @@ class Ui_Settings(object):
         self.pushButton_2.setText(_translate("Settings", "Einstelungen zurücksetzen"))
         self.pushButton_3.setText(_translate("Settings", "Datenbank zurücksetzen"))
         self.checkBox.setToolTip(_translate("Settings", "Browser Fenster verstecken"))
-        self.checkBox.setText(_translate("Settings", "Google Chrome headless (macOS: Chrome 59/Windows: Chrome 60)"))
+        self.checkBox.setText(_translate("Settings", "Google Chrome Headless Mode (ab Chrome 60)"))
 

@@ -26,20 +26,23 @@ SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd)"
 usage() {
 	cat <<EOF
 Usage:
-$(basename "$0") [-h] [-b -c -r]
+$(basename "$0") [-h] [-c -d -r -s]
 
 Description:
-Builds the FuME.app with PyInstaller which is located in 'dist' directory.
+Builds FuME with PyInstaller which is located in 'dist' directory.
 
 Optional switches:
-  -b, --build-dmg
-    Builds a .dmg with the new FuME.app.
-
   -c, --clean-up
-    Removes 'dist' and 'build' directory if exist.
+    Removes 'dist' and 'build' directory if existing.
+
+  -d, --build-dmg
+    Builds a .dmg with the new FuME.app.
 
   -r, --reset
     Removes Application Support files (e.g. database) and FuMEs setting files, useful for developing
+
+  -s, --build-exe
+    Builds an Installer for Windows
 
 EOF
 }
@@ -51,8 +54,8 @@ msg_error() {
 	echo "\033[0;31m-- $1\033[0m"
 }
 
-build_app() {
-    msg_status "Building FuME.app with PyInstaller"
+build() {
+    msg_status "Building FuME with PyInstaller"
     pyinstaller -y --log-level=WARN main.spec
     msg_status "Finished building"
 }
@@ -60,9 +63,15 @@ build_app() {
 build_dmg() {
     msg_status "Building FuME.dmg in 'dist'"
     cd dist
-    /usr/local/bin/dmgbuild -s ../dmgsettings.py "FuME" FuME.dmg
+    /usr/local/bin/dmgbuild -s ../build_dmg.py "FuME" FuME.dmg
     cd ..
     msg_status "Finished building .dmg"
+}
+
+build_exe() {
+    msg_status "Building FuME.exe in 'dist'"
+    "C:\Program Files (x86)\Inno Setup 5\ISCC" build_setup.iss
+    msg_status "Finished building .exe"
 }
 
 cleanup() {
@@ -90,7 +99,7 @@ reset() {
 while [[ $# -gt 0 ]]; do
     key="$1"
     case ${key} in
-        -b|--build-dmg)
+        -d|--build-dmg)
         dmg=true
         ;;
         -c|--cleanup)
@@ -98,6 +107,9 @@ while [[ $# -gt 0 ]]; do
         ;;
         -r|--reset)
         reset=true
+        ;;
+        -s|--build-exe)
+        exe=true
         ;;
         -h|-?|--help)
         usage
@@ -118,8 +130,10 @@ elif [ "$reset" = true ]; then
     reset
 fi
 
-build_app
+build
 
 if [ "$dmg" = true ]; then
     build_dmg
+elif [ "$exe" = true ]; then
+    build_exe
 fi

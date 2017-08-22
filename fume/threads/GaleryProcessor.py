@@ -64,7 +64,7 @@ class GaleryProcessor(QtCore.QThread):
     def run(self):
         self.loggerSignal.emit("Initialisiere Browser...")
         options = webdriver.ChromeOptions()
-        if self.settings.value('chrome/headless', False, bool):
+        if self.settings.value('chrome/headless', True, bool):
             options.add_argument('--headless')
 
         try:

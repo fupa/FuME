@@ -24,7 +24,7 @@ import os.path
 import os
 
 # Usage:
-# $ dmgbuild -s dmgsettings.py "FuME" FuME.dmg
+# $ dmgbuild -s build_dmg.py "FuME" FuME.dmg
 
 # .. Useful stuff ..............................................................
 
@@ -41,10 +41,15 @@ def icon_from_app(app_path):
     icon_name = icon_root + icon_ext
     return os.path.join(app_path, 'Contents', 'Resources', icon_name)
 
+def version_from_app(app_path):
+    plist_path = os.path.join(app_path, 'Contents', 'Info.plist')
+    plist = biplist.readPlist(plist_path)
+    return plist['CFBundleShortVersionString']
+
 # .. Basics ....................................................................
 
 # Uncomment to override the output filename
-filename = 'FuME.dmg'
+filename = 'FuME-' + version_from_app(application) + '.dmg'
 
 # Uncomment to override the output volume name
 volume_name = 'FuME'

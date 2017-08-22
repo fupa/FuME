@@ -44,7 +44,7 @@ class UpdateProcessor(QtCore.QThread):
 
     def run(self):
         try:
-            xml = self.download('http://www.afeldl.de/fume.xml').content
+            xml = self.download('https://fupadev.github.io/FuME/appcast.xml').content
         except Exception as e:
             self.loggerSignal.emit('Es konnte nicht auf Updates überprüft werden: %s' % str(e))
             return

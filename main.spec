@@ -1,6 +1,4 @@
 # -*- mode: python -*-
-#
-#
 # --------------------------------------------------------------------------
 # FuME FuPa Match Explorer Copyright (c) 2017 Andreas Feldl <fume@afeldl.de>
 #
@@ -40,6 +38,8 @@ name = 'FuME'
 version = '1.1'
 debug = False
 console = False
+excludes = []
+onefile_windows = False
 
 if platform == "darwin" or platform == "linux" or platform == "linux2":
     # macOS or linux
@@ -48,9 +48,11 @@ if platform == "darwin" or platform == "linux" or platform == "linux2":
     binaries = [('chromedriver', '.')]
     datas = [('db/sql_default.db', 'db/.'),
              ('bin/header_klein.png', 'bin/.'),
-             ('bin/qtbase_de.qm' , 'bin/.'),
+             ('bin/qtbase_de.qm', 'bin/.'),
+             ('LICENSE', '.'),
              ('bin/buttons', 'bin/buttons/.')]
     icon = 'bin/icon.icns'
+    name_coll = name + '_mac'
 else:
     # Windows
     os = 'windows'
@@ -62,8 +64,10 @@ else:
              ('bin\\header_klein.png', 'bin\\.'),
              ('bin\\qtbase_de.qm', 'bin\\.'),
              ('bin\\icon.ico', 'bin\\.'),
+             ('LICENSE', '.'),
              ('bin\\buttons\\', 'bin\\buttons\\.')]
     icon = 'bin\\icon.ico'
+    name_coll = name + '_win'
 
 a = Analysis(['main.py'],
              pathex=pathex,
@@ -72,7 +76,7 @@ a = Analysis(['main.py'],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
-             excludes=[],
+             excludes=excludes,
              win_no_prefer_redirects=False,
              win_private_assemblies=False,
              cipher=block_cipher)
@@ -91,17 +95,28 @@ if os == 'unix':
               console=console,
               icon=icon)
 else:
-    exe = EXE(pyz,
-              a.scripts,
-              a.binaries,
-              a.zipfiles,
-              a.datas,
-              name=name,
-              debug=debug,
-              strip=False,
-              upx=True,
-              console=console,
-              icon=icon)
+    if onefile_windows:
+        exe = EXE(pyz,
+                  a.scripts,
+                  a.binaries,
+                  a.zipfiles,
+                  a.datas,
+                  name=name,
+                  debug=debug,
+                  strip=False,
+                  upx=True,
+                  console=console,
+                  icon=icon)
+    else:
+        exe = EXE(pyz,
+                  a.scripts,
+                  exclude_binaries=True,
+                  name=name,
+                  debug=debug,
+                  strip=False,
+                  upx=True,
+                  console=False,
+                  icon=icon)
 
 coll = COLLECT(exe,
                a.binaries,
@@ -109,7 +124,7 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=True,
-               name=name)
+               name=name_coll)
 
 app = BUNDLE(coll,
              name=name + '.app',

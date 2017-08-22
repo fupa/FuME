@@ -141,7 +141,7 @@ class ReserveProcessor(QtCore.QThread):
         counter = 0
 
         options = webdriver.ChromeOptions()
-        if self.settings.value('chrome/headless', False, bool):
+        if self.settings.value('chrome/headless', True, bool):
             options.add_argument('--headless')
 
         try:
@@ -202,7 +202,7 @@ class ReserveProcessor(QtCore.QThread):
     def runDelete(self):
         self.statusBarSignal.emit("Lösche Reservierungen...")
         options = webdriver.ChromeOptions()
-        if self.settings.value('chrome/headless', False, bool):
+        if self.settings.value('chrome/headless', True, bool):
             options.add_argument('--headless')
 
         try:

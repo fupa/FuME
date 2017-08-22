@@ -57,18 +57,18 @@ class CustomSqlModel(QtSql.QSqlQueryModel):
     def data(self, item, role):
         # Changing color if "reserved" is True
         if role == QtCore.Qt.BackgroundRole:
-            if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 1:
-                return QtGui.QBrush(QtGui.QColor.fromRgb(176, 234, 153))
-            if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 2:
-                return QtGui.QBrush(QtGui.QColor.fromRgb(234, 189, 190))
-
-        # Changing value 0=False, 1=True - deprecated
-        # if role == QtCore.Qt.DisplayRole:
-        #     if item.column() == 7:
-        #         if QtSql.QSqlQueryModel.data(self, item, QtCore.Qt.DisplayRole) == 1:
-        #             return True
-        #         else:
-        #             return False
+            if item.row() % 2: # alternating background color
+                # dark
+                if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 1:
+                    return QtGui.QBrush(QtGui.QColor.fromRgb(176, 234, 153))
+                if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 2:
+                    return QtGui.QBrush(QtGui.QColor.fromRgb(234, 189, 190))
+            else:
+                # light
+                if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 1:
+                    return QtGui.QBrush(QtGui.QColor.fromRgb(198, 247, 178))
+                if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 2:
+                    return QtGui.QBrush(QtGui.QColor.fromRgb(250, 217, 218))
 
         return QtSql.QSqlQueryModel.data(self, item, role)
 
@@ -79,6 +79,13 @@ class CustomSqlModel(QtSql.QSqlQueryModel):
         queryStr = self.query().executedQuery()
         self.query().clear()
         self.setQuery(queryStr)
+
+    # def setData(self, index, value, role):
+    #     # TODO
+    #     return True
+
+    def flags(self, index):
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable #| QtCore.Qt.ItemIsEditable
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -346,7 +353,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.listWidget.item(i).setHidden(False)
 
     def write_settings(self):
-        # $HOME/Library/Preferences/com.fume.Match-Explorer.plist
+        # Windows: (regedit) HKEY_CURRENT_USER\fume\Match-Explorer
+        # macOS: $HOME/Library/Preferences/com.fume.Match-Explorer.plist
+
         self.settings.setValue('mainwindow/size', self.size())
         self.settings.setValue('mainwindow/pos', self.pos())
 
@@ -370,15 +379,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         except:
             pass
 
-        self.actionZeitraum.setChecked(self.settings.value('menubar/date/range', True, type=bool))
-        self.actionZeitpunkt.setChecked(self.settings.value('menubar/date/day', False, type=bool))
+        self.actionZeitraum.setChecked(self.settings.value('menubar/date/range', True, bool))
+        self.actionZeitpunkt.setChecked(self.settings.value('menubar/date/day', False, bool))
 
         now = datetime.datetime.now()
         self.dateEdit_3.setDate(self.settings.value('date_from_calendar', QtCore.QDate(now.year, now.month, now.day)))
         self.dateEdit_4.setDate(self.settings.value('date_to_calendar', QtCore.QDate(now.year, now.month, now.day)))
 
         # dbPaths
-        # Windows: C:\Documents and Settings\<User>\Application Data\Local Settings\FuME\FuME
+        # Windows: ﻿C:\Users\<User>\AppData\Local\FuME\FuME
         # macOS: /Users/<User>/Library/Application Support/FuME
         userDataDir = appdirs.user_data_dir('FuME', 'FuME')
         src = self.get_pathToTemp(['db', 'sql_default.db'])
@@ -579,8 +588,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def invertSelection(self):
+        region = self.comboBox.currentText()
         for i in range(self.listWidget.count()):
-            if not self.listWidget.item(i).isHidden():
+            itemData = self.listWidget.item(i).data(QtCore.Qt.UserRole)
+            if not self.listWidget.item(i).isHidden() and itemData == region:
                 self.listWidget.setCurrentRow(i, QtCore.QItemSelectionModel.Toggle)
 
     @QtCore.pyqtSlot()

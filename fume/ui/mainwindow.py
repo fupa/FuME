@@ -247,7 +247,7 @@ class Ui_MainWindow(object):
         self.pushButton.setText(_translate("MainWindow", "Eintrag ändern"))
         self.pushButton_11.setText(_translate("MainWindow", "Spiele reservieren"))
         self.pushButton_5.setText(_translate("MainWindow", "Spiele importieren"))
-        self.pushButton_2.setText(_translate("MainWindow", "Galerie hochladen"))
+        self.pushButton_2.setText(_translate("MainWindow", "Galerie erstellen"))
         self.label_3.setText(_translate("MainWindow", "Auswahl modifizieren"))
         __sortingEnabled = self.listWidget.isSortingEnabled()
         self.listWidget.setSortingEnabled(False)

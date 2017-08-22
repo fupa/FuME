@@ -6,84 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>396</width>
-    <height>408</height>
+    <width>400</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Eintrag bearbeiten</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="10" column="0" colspan="2">
-    <widget class="QPushButton" name="pushButton">
-     <property name="text">
-      <string>Eintrag löschen*</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_5">
-     <property name="text">
-      <string>Heim</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_8">
-     <property name="text">
-      <string>Region</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="6" column="0">
-    <widget class="QLabel" name="label_6">
-     <property name="text">
-      <string>Gast</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
-    <widget class="QLineEdit" name="lineEdit_2"/>
-   </item>
-   <item row="11" column="1">
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
-     </property>
-    </widget>
-   </item>
    <item row="7" column="1">
-    <widget class="QLineEdit" name="lineEdit_6"/>
+    <widget class="QLineEdit" name="lineEdit_7"/>
    </item>
-   <item row="2" column="1">
-    <widget class="QLineEdit" name="lineEdit"/>
-   </item>
-   <item row="6" column="1">
+   <item row="5" column="1">
     <widget class="QLineEdit" name="lineEdit_5"/>
    </item>
    <item row="0" column="0" colspan="2">
@@ -102,20 +36,17 @@
      </property>
     </widget>
    </item>
-   <item row="8" column="1">
-    <widget class="QLineEdit" name="lineEdit_7"/>
+   <item row="4" column="1">
+    <widget class="QLineEdit" name="lineEdit_4"/>
    </item>
-   <item row="3" column="0" alignment="Qt::AlignRight">
+   <item row="2" column="0" alignment="Qt::AlignRight">
     <widget class="QLabel" name="label_3">
      <property name="text">
       <string>Liga*</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
-    <widget class="QLineEdit" name="lineEdit_4"/>
-   </item>
-   <item row="2" column="0">
+   <item row="1" column="0">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>ID</string>
@@ -125,7 +56,7 @@
      </property>
     </widget>
    </item>
-   <item row="7" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="label_7">
      <property name="text">
       <string>Tore*</string>
@@ -135,7 +66,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="3" column="0">
     <widget class="QLabel" name="label_4">
      <property name="text">
       <string>Datum/Uhrzeit*</string>
@@ -145,15 +76,84 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="3" column="1">
     <widget class="QLineEdit" name="lineEdit_3"/>
    </item>
-   <item row="9" column="0" colspan="2">
+   <item row="8" column="0" colspan="2">
     <widget class="QLabel" name="label_9">
      <property name="text">
       <string>* wird beim importieren überschrieben</string>
      </property>
     </widget>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>Gast</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_8">
+     <property name="text">
+      <string>Region</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>Heim</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="2">
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Eintrag löschen*</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QLineEdit" name="lineEdit_2"/>
+   </item>
+   <item row="11" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Save</set>
+     </property>
+    </widget>
+   </item>
+   <item row="6" column="1">
+    <widget class="QLineEdit" name="lineEdit_6"/>
+   </item>
+   <item row="1" column="1">
+    <widget class="QLineEdit" name="lineEdit"/>
+   </item>
+   <item row="9" column="0">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
