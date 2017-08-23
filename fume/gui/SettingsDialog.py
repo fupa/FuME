@@ -1,14 +1,33 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# --------------------------------------------------------------------------
+# FuME FuPa Match Explorer Copyright (c) 2017 Andreas Feldl <fume@afeldl.de>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# The full license of the GNU General Public License is in the file LICENCE,
+# distributed with this software; if not, see http://www.gnu.org/licenses/.
+# --------------------------------------------------------------------------
 
 import os
+import shutil
 import sys
 import time
 
+import appdirs
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
-from selenium import common
 from selenium import webdriver
+from selenium.webdriver import Remote
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
@@ -23,9 +42,13 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
         self.setModal(True)
         self.settings = QtCore.QSettings('fume', 'Match-Explorer')
 
+        self.checkBox.setChecked(self.settings.value('chrome/headless', True, bool))
+
         # Connections
         self.pushButton.clicked.connect(self.createCookie)
         self.pushButton_2.clicked.connect(self.deleteSettings)
+        self.pushButton_3.clicked.connect(self.deleteDatabase)
+        self.checkBox.stateChanged.connect(self.checkBox_changed)
         self.accepted.connect(self.lineEdit_2.clear)
 
     def waitForLoad(self, inputXPath, browser, PATIENCE_TIME):
@@ -41,40 +64,34 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
 
         return os.path.join(base_path, relative_path)
 
-    def isFrozen(self):
-        # TODO Use this
-        if getattr(sys, 'frozen', False):
-            return True
-        else:
-            return False
+    # def isFrozen(self):
+    #     if getattr(sys, 'frozen', False):
+    #         return True
+    #     else:
+    #         return False
 
     @QtCore.pyqtSlot()
     def createCookie(self):
         __username = self.lineEdit.text()
         __password = self.lineEdit_2.text()
 
-        # TODO webdriver.Chrome -> webdirver.Remote wie in ../simpleqt/main.py
-
         options = webdriver.ChromeOptions()
         # waiting for Chrome 60 on Windows
         # Chrome 59 for macOS already supports headless Chrome!
-        # options.add_argument('--headless')
+        if self.settings.value('chrome/headless', True, bool):
+            options.add_argument('--headless')
 
         # https://doc.qt.io/qt-5/qmessagebox.html
         msgBox = QtWidgets.QMessageBox()
 
         try:
-            sys._MEIPASS
-            # runs as app  - get path to chromedriver in project folder
-            self.driver = webdriver.Chrome(self.get_pathToTemp('chromedriver'), chrome_options=options)
-        except AttributeError:
-            # runs in terminal - using chromedriver in $PATH
-            self.driver = webdriver.Chrome(chrome_options=options)
-        except common.exceptions.WebDriverException:
-            # no Chrome found
-            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keinen Treiber gefunden!"),
-                                           QtWidgets.qApp.tr("Kein Google Chrome installiert!\n\n"
-                                                             "Chrome installieren um forzufahren."),
+            self.driver = Remote('http://localhost:9515', desired_capabilities=options.to_capabilities())
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keine Verbindung zu Google Chrome!"),
+                                           QtWidgets.qApp.tr(
+                                               "Es konnte keine Verbindung zu Google Chrome hergestellt werden! "
+                                               "Bitte stelle sicher, dass alle Systemvoraussetzungen erfüllt sind.\n\n"
+                                               "Fehler:\n" + str(e)),
                                            QtWidgets.QMessageBox.Cancel)
             return
 
@@ -110,13 +127,38 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
     @QtCore.pyqtSlot()
     def deleteSettings(self):
         ret = QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Alle Einstellungen löschen"),
-                                             QtWidgets.qApp.tr("Willst du wirklich alle Einstellungen löschen?\n\n"
-                                                               "Drücke OK zum bestätigen und Cancel zum abbrechen."),
+                                             QtWidgets.qApp.tr("Willst du wirklich alle Einstellungen löschen? "
+                                                               "Alle Einstellungen gehen verloren.\n\n"
+                                                               "Drücke OK um zu bestätigen und Abbrechen um zurückzukehren."),
                                              QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
         if ret == QtWidgets.QMessageBox.Ok:
             QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Alle Einstellungen löschen"),
-                                           QtWidgets.qApp.tr("Alle Einstellungen werden gelöscht "
-                                                             "und das Programm beendet"),
+                                           QtWidgets.qApp.tr("Alle Einstellungen werden gelöscht und das Programm beendet\n\n"
+                                                             "Nach dem Beenden sind alle Einstellungen entfernt."),
                                            QtWidgets.QMessageBox.Ok)
+
+            self.parent().close()
             self.settings.clear()
-            sys.exit(1)
+
+    @QtCore.pyqtSlot()
+    def deleteDatabase(self):
+        appdir = appdirs.user_data_dir('FuME', 'FuME')
+        ret = QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Datenbank löschen"),
+                                             QtWidgets.qApp.tr("Willst du wirklich die Datenbank von FuME löschen? "
+                                                               "Alle importierten Spiele gehen verloren.\n\n"
+                                                               "Drücke OK um zu bestätigen und Abbrechen um zurückzukehren."),
+                                             QtWidgets.QMessageBox.Ok | QtWidgets.QMessageBox.Cancel)
+        if ret == QtWidgets.QMessageBox.Ok:
+            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Datenbank löschen"),
+                                           QtWidgets.qApp.tr("Die Datenbank wird gelöscht und das Programm beendet.\n\n"
+                                                             "Nach dem Beenden sind alle Spiele entfernt."),
+                                           QtWidgets.QMessageBox.Ok)
+            self.parent().close()
+            shutil.rmtree(appdir)
+
+    @QtCore.pyqtSlot(int)
+    def checkBox_changed(self, int):
+        if int:  # 1: checkBox checked
+            self.settings.setValue('chrome/headless', True)
+        else:
+            self.settings.setValue('chrome/headless', False)

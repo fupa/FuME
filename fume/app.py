@@ -1,10 +1,28 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# --------------------------------------------------------------------------
+# FuME FuPa Match Explorer Copyright (c) 2017 Andreas Feldl <fume@afeldl.de>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# The full license of the GNU General Public License is in the file LICENCE,
+# distributed with this software; if not, see http://www.gnu.org/licenses/.
+# --------------------------------------------------------------------------
 
 import datetime
 import os
 import shutil
 import sys
+import webbrowser
 
 import appdirs
 from PyQt5 import QtCore
@@ -12,12 +30,21 @@ from PyQt5 import QtGui
 from PyQt5 import QtSql
 from PyQt5 import QtWidgets
 
+from fume.gui.AboutDialog import AboutDialog
+from fume.gui.AboutQtDialog import AboutQtDialog
+from fume.gui.EditDialog import EditDialog
 from fume.gui.FilterDialog import FilterDialog
+from fume.gui.GaleryDialog import GaleryDialog
 from fume.gui.LogDialog import LogDialog
 from fume.gui.SettingsDialog import SettingsDialog
+from fume.gui.UpdateDialog import UpdateDialog
+from fume.threads.ChromeDriverProcessor import ChromeDriverProcessor
 from fume.threads.DownloadProcessor import DownloadProcessor
 from fume.threads.ReserveProcessor import ReserveProcessor
+from fume.threads.UpdateProcessor import UpdateProcessor
 from fume.ui.mainwindow import Ui_MainWindow
+
+version = '1.1'
 
 
 class CustomSqlModel(QtSql.QSqlQueryModel):
@@ -30,18 +57,18 @@ class CustomSqlModel(QtSql.QSqlQueryModel):
     def data(self, item, role):
         # Changing color if "reserved" is True
         if role == QtCore.Qt.BackgroundRole:
-            if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 1:
-                return QtGui.QBrush(QtGui.QColor.fromRgb(176, 234, 153))
-            if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 2:
-                return QtGui.QBrush(QtGui.QColor.fromRgb(234, 189, 190))
-
-        # Changing value 0=False, 1=True - deprecated
-        # if role == QtCore.Qt.DisplayRole:
-        #     if item.column() == 7:
-        #         if QtSql.QSqlQueryModel.data(self, item, QtCore.Qt.DisplayRole) == 1:
-        #             return True
-        #         else:
-        #             return False
+            if item.row() % 2: # alternating background color
+                # dark
+                if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 1:
+                    return QtGui.QBrush(QtGui.QColor.fromRgb(176, 234, 153))
+                if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 2:
+                    return QtGui.QBrush(QtGui.QColor.fromRgb(234, 189, 190))
+            else:
+                # light
+                if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 1:
+                    return QtGui.QBrush(QtGui.QColor.fromRgb(198, 247, 178))
+                if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 2:
+                    return QtGui.QBrush(QtGui.QColor.fromRgb(250, 217, 218))
 
         return QtSql.QSqlQueryModel.data(self, item, role)
 
@@ -53,22 +80,38 @@ class CustomSqlModel(QtSql.QSqlQueryModel):
         self.query().clear()
         self.setQuery(queryStr)
 
+    # def setData(self, index, value, role):
+    #     # TODO
+    #     return True
+
+    def flags(self, index):
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable #| QtCore.Qt.ItemIsEditable
+
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-        self.set_statusBar()
-        self.label.setPixmap(QtGui.QPixmap(self.get_pathToTemp(os.path.join("bin", "header_klein.png"))))
+        # self.checkBox_2.setVisible(False)
 
+        self.set_statusBar()
         self.read_settings()
+
+        if sys.platform == "win32":
+            self.setWindowIcon(QtGui.QIcon(self.get_pathToTemp(['bin', 'icon.ico'])))
+        self.header = self.get_pathToTemp(["bin", "header_klein.png"])
+        self.label.setPixmap(QtGui.QPixmap(self.header))
 
         self.logDialog = LogDialog(self)
         self.settingsDialog = SettingsDialog(self)
+        self.aboutDialog = AboutDialog(path=self.header, version=version, parent=self)
+        self.aboutQtDialog = AboutQtDialog(self)
 
         if not self.set_database():
             sys.exit(1)
 
+        self.set_menuBar()
+        self.set_chromeDriver()
         self.set_connections()
         self.set_tableStyleSheet()
         self.set_tableView()
@@ -76,19 +119,29 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.matchFilterString = ''
         self.regionFilterString = ''
         self.dateFilterString = ''
+        self.resFilterString = ''
 
         self.set_comboBoxItems()
         self.date_changed()  # set date-range
         self.set_listWidget()
         self.comboBox_changed()  # set region
+        self.datePeriodMenu_changed()
+        self.viewMenu_changed()
 
-        # last tweaks on tableView before show()
+        if not self.settings.value('updates/noautoupdate', False, bool):
+            self.checkForUpdates(active=False)
+
         self.tableView.hideColumn(7)
         self.tableView.hideColumn(8)
 
-        widths = [72, 220, 125, 220, 220, 60, 140]
-        for i, d in enumerate(widths):
-            self.tableView.setColumnWidth(i, d)
+        # widths = [72, 220, 125, 220, 220, 60, 140]
+        # for i, d in enumerate(widths):
+        #     self.tableView.setColumnWidth(i, d)
+        self.tableView.resizeColumnsToContents()
+
+        # Fixes "Error": (from https://stackoverflow.com/a/39311662/6304901)
+        # QBasicTimer::start: QBasicTimer can only be used with threads started with QThread
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
         self.show()
 
@@ -97,81 +150,63 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Permanent labels
         self.statusBarLabel_1 = QtWidgets.QLabel(self.statusBar)
-        self.statusBar.addPermanentWidget(self.statusBarLabel_1, 0)
+        self.statusBar.addPermanentWidget(self.statusBarLabel_1)
+
+    def set_menuBar(self):
+        self.actionUeber.triggered.connect(self.aboutDialog.show)
+        self.action_ber_QT.triggered.connect(self.aboutQtDialog.show)
+        self.actionEinstellungen.triggered.connect(self.settingsDialog.show)
+        self.actionLog.triggered.connect(self.logDialog.show)
+        self.actionBeenden.triggered.connect(self.close)
+        self.actionHeute.triggered.connect(self.set_timeEditNow)
+        self.actionAuf_Update_berpr_fen.triggered.connect(self.checkForUpdates)
+        self.actionImportieren.triggered.connect(self.download_match)
+        self.actionHinzuf_gen_reservieren.triggered.connect(self.reserve_match)
+        self.actionL_schen.triggered.connect(self.deleteReservation)
+        self.actionGalerie_hochladen.triggered.connect(self.showGaleryDialog)
+        self.actionBearbeiten.triggered.connect(self.showEditDialog)
+        self.actionSpielbericht_anzeigen.triggered.connect(self.openGameReport)
+
+        dateRangeGroup = QtWidgets.QActionGroup(self)
+        dateRangeGroup.addAction(self.actionZeitpunkt)
+        dateRangeGroup.addAction(self.actionZeitraum)
+        dateRangeGroup.triggered.connect(self.datePeriodMenu_changed)
+
+        viewGroup = QtWidgets.QActionGroup(self)
+        viewGroup.addAction(self.actionAnsichtSpiele)
+        viewGroup.addAction(self.actionAnsichtReservierungen)
+        viewGroup.triggered.connect(self.viewMenu_changed)
 
     def set_connections(self):
         # Push Buttons
-        # self.pushButton.clicked.connect(self.showFilterDialog)
-        # self.pushButton_2.clicked.connect(self.invertSelection)
-        self.pushButton_3.clicked.connect(self.logDialog.show)
-        self.pushButton_4.clicked.connect(self.settingsDialog.show)
+        self.pushButton.clicked.connect(self.showEditDialog)
+        self.pushButton_2.clicked.connect(self.showGaleryDialog)
         self.pushButton_5.clicked.connect(self.download_match)
-        # self.pushButton_9.clicked.connect(self.listWidget.selectionModel().clearSelection)
-        # self.pushButton_10.clicked.connect(self.restoreSelection)
         self.pushButton_11.clicked.connect(self.reserve_match)
 
         # Command Link Buttons
-        self.commandLinkButton.setIcon(QtGui.QIcon(""))
-        self.commandLinkButton_2.setIcon(QtGui.QIcon(""))
-        self.commandLinkButton_3.setIcon(QtGui.QIcon(""))
-        self.commandLinkButton_4.setIcon(QtGui.QIcon(""))
-        self.commandLinkButton_5.setIcon(QtGui.QIcon(""))
+        base = self.get_pathToTemp(['bin', 'buttons'], True)
+        buttons = [self.commandLinkButton, self.commandLinkButton_2, self.commandLinkButton_3, self.commandLinkButton_4,
+                   self.commandLinkButton_5]
+        images = ['add-button-inside-black-circle', 'rounded-remove-button',
+                  'rounded-adjust-button-with-plus-and-minus', 'cancel-button', 'swap-vertical-orientation-arrows']
+        connections = [self.showFilterDialog, self.removeSelectedItems, self.invertSelection, self.resetSelection,
+                       self.restoreSelection]
+        tooltips = ["Mannschaften hinzufügen", "Ausgewählte Mannschaften entfernen", "Auswahl umkehren",
+                    "Auswahl löschen",
+                    "Auswahl zurücksetzen"]
 
-        self.commandLinkButton.setMaximumSize(21, 21)
-        self.commandLinkButton_2.setMaximumSize(21, 21)
-        self.commandLinkButton_3.setMaximumSize(21, 21)
-        self.commandLinkButton_4.setMaximumSize(21, 21)
-        self.commandLinkButton_5.setMaximumSize(21, 21)
+        for button, image, connection, tooltip in zip(buttons, images, connections, tooltips):
+            button.setIcon(QtGui.QIcon(""))  # removing default image set by QtDesigner
+            button.setMaximumSize(21, 21)
+            button.setStyleSheet(
+                "QPushButton {{border-image: url({base}/{image}.png);}}"
+                "QPushButton:hover {{border-image: url({base}/{image}_hover.png);}}".format(base=base, image=image)
+            )
+            button.clicked.connect(connection)
+            button.setToolTip(tooltip)
 
-        self.commandLinkButton.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                             "QPushButton:hover {border-image: url(%s);}" % (
-                                                 self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                  'add-button-inside-black-circle.png')),
-                                                 self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                  'add-button-inside-black-circle_hover.png')))
-                                             )
-        self.commandLinkButton_2.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                               "QPushButton:hover {border-image: url(%s);}" % (
-                                                   self.get_pathToTemp(
-                                                       os.path.join('bin', 'buttons', 'rounded-remove-button.png')),
-                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                    'rounded-remove-button_hover.png')))
-                                               )
-        self.commandLinkButton_3.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                               "QPushButton:hover {border-image: url(%s);}" % (
-                                                   self.get_pathToTemp(
-                                                       os.path.join('bin', 'buttons',
-                                                                    'rounded-adjust-button-with-plus-and-minus.png')),
-                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                    'rounded-adjust-button-with-plus-and-minus_hover.png')))
-                                               )
-        self.commandLinkButton_4.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                               "QPushButton:hover {border-image: url(%s);}" % (
-                                                   self.get_pathToTemp(
-                                                       os.path.join('bin', 'buttons', 'cancel-button.png')),
-                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                    'cancel-button_hover.png')))
-                                               )
-        self.commandLinkButton_5.setStyleSheet("QPushButton {border-image: url(%s);}"
-                                               "QPushButton:hover {border-image: url(%s);}" % (
-                                                   self.get_pathToTemp(
-                                                       os.path.join('bin', 'buttons',
-                                                                    'swap-vertical-orientation-arrows.png')),
-                                                   self.get_pathToTemp(os.path.join('bin', 'buttons',
-                                                                                    'swap-vertical-orientation-arrows_hover.png')))
-                                               )
-
-        self.commandLinkButton.clicked.connect(self.showFilterDialog)
-        self.commandLinkButton_2.clicked.connect(self.removeSelectedItems)
-        self.commandLinkButton_3.clicked.connect(self.invertSelection)
-        self.commandLinkButton_4.clicked.connect(self.resetSelection)
-        self.commandLinkButton_5.clicked.connect(self.restoreSelection)
-
-        self.commandLinkButton.setToolTip("Auswahl hinzufügen")
-        self.commandLinkButton_2.setToolTip("Auswahl entfernen")
-        self.commandLinkButton_3.setToolTip("Auswahl umkehren")
-        self.commandLinkButton_4.setToolTip("Auswahl löschen")
-        self.commandLinkButton_5.setToolTip("Auswahl zurücksetzen")
+        self.commandLinkButton_5.setVisible(False)  # currently not working properly
 
         # Other
         self.dateEdit_3.dateChanged.connect(self.date_changed)
@@ -229,6 +264,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                  'Suedwestfalen', 'Thueringen', 'Weser-Ems', 'Westpfalz', 'Westrhein', 'Wiesbaden']
         self.comboBox.addItems(items)
         self.comboBox.setCurrentText(self.settings.value('region', 'Alle'))
+        # self.comboBox.setItemData(self.comboBox.currentIndex(), QtGui.QColor.fromRgb(176, 234, 153), QtCore.Qt.ForegroundRole)
 
     def set_listWidget(self):
         # Sets the default values if the fume is closed without any elements in listWidget
@@ -251,19 +287,62 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.itemSelection_changed()
         self.current_selection = [x for x in self.listWidget.selectedItems()]  # for restoring selection
 
+    def set_timeEditNow(self):
+        now = datetime.datetime.now()
+        self.dateEdit_3.setDate(QtCore.QDate(now.year, now.month, now.day))
+        self.dateEdit_4.setDate(QtCore.QDate(now.year, now.month, now.day))
+
     def get_filterString(self):
         # Only join not empty filter strings
-        str = ' AND '.join(filter(None, [self.dateFilterString, self.matchFilterString, self.regionFilterString]))
+        str = ' AND '.join(filter(None, [self.dateFilterString, self.matchFilterString, self.regionFilterString,
+                                         self.resFilterString]))
         # print(str)
         return str
 
-    def get_pathToTemp(self, relative_path):
+    def get_pathToTemp(self, relative_path, css=False):
+        # relative_path is a List or Array
+        # set css to True if used for .setStyleSheet so '/' is set as separator instead of '\\'
         try:
             base_path = sys._MEIPASS
         except Exception:
             base_path = os.path.abspath(".")
 
-        return os.path.join(base_path, relative_path)
+        if css and sys.platform == "win32":
+            # Fixes "could not parse stylesheet of object ..." thrown by .setStyleSheet
+            return os.path.join(base_path, *relative_path).replace("\\", "/")
+
+        return os.path.join(base_path, *relative_path)
+
+    def get_selectedMatches(self):
+        selected = []
+        indexes = self.tableView.selectedIndexes()
+
+        if indexes == []:
+            QtWidgets.QMessageBox.information(self, QtWidgets.qApp.tr("Keine Spiele ausgewählt"),
+                                              QtWidgets.qApp.tr("Du hast kein Spiel ausgewählt.\n\n"
+                                                                "Bitte markiere eine oder mehrere Zeilen "
+                                                                "in der Spielübersicht und probiere es erneut."),
+                                              QtWidgets.QMessageBox.Ok)
+            return None
+        else:
+            for index in sorted(indexes):
+                match_id = self.tableView.model().record(index.row()).value('match_id')
+                match_date = self.tableView.model().record(index.row()).value('match_date')
+                home = self.tableView.model().record(index.row()).value('home')
+                guest = self.tableView.model().record(index.row()).value('guest')
+                selected.append({'match_id': match_id, 'match_date': match_date, 'home': home, 'guest': guest})
+            return selected
+
+    def get_cookies(self):
+        cookies = self.settings.value('cookie', '')
+        if cookies == '':
+            QtWidgets.QMessageBox.information(self, QtWidgets.qApp.tr("Cookies"),
+                                              QtWidgets.qApp.tr("Keine Cookies vorhanden.\n\n"
+                                                                "Erstelle jetzt deine Cookies in den Einstellungen"),
+                                              QtWidgets.QMessageBox.Ok)
+            return None
+        else:
+            return cookies
 
     def hideAll(self):
         for i in range(0, self.listWidget.count()):
@@ -274,6 +353,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.listWidget.item(i).setHidden(False)
 
     def write_settings(self):
+        # Windows: (regedit) HKEY_CURRENT_USER\fume\Match-Explorer
+        # macOS: $HOME/Library/Preferences/com.fume.Match-Explorer.plist
+
+        self.settings.setValue('mainwindow/size', self.size())
+        self.settings.setValue('mainwindow/pos', self.pos())
+
+        self.settings.setValue('menubar/date/range', self.actionZeitraum.isChecked())
+        self.settings.setValue('menubar/date/day', self.actionZeitpunkt.isChecked())
+
         self.settings.setValue('date_from_calendar', self.dateEdit_3.date())
         self.settings.setValue('date_to_calendar', self.dateEdit_4.date())
         self.settings.setValue('filter_calendar', [x.text() for x in self.listWidget.selectedItems()])
@@ -284,15 +372,25 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def read_settings(self):
         self.settings = QtCore.QSettings('fume', 'Match-Explorer')
+
+        self.resize(self.settings.value('mainwindow/size', self.size()))
+        try:
+            self.move(self.settings.value('mainwindow/pos'))
+        except:
+            pass
+
+        self.actionZeitraum.setChecked(self.settings.value('menubar/date/range', True, bool))
+        self.actionZeitpunkt.setChecked(self.settings.value('menubar/date/day', False, bool))
+
         now = datetime.datetime.now()
         self.dateEdit_3.setDate(self.settings.value('date_from_calendar', QtCore.QDate(now.year, now.month, now.day)))
         self.dateEdit_4.setDate(self.settings.value('date_to_calendar', QtCore.QDate(now.year, now.month, now.day)))
 
         # dbPaths
-        # Windows: C:\Documents and Settings\<User>\Application Data\Local Settings\FuME\FuME
+        # Windows: ﻿C:\Users\<User>\AppData\Local\FuME\FuME
         # macOS: /Users/<User>/Library/Application Support/FuME
         userDataDir = appdirs.user_data_dir('FuME', 'FuME')
-        src = self.get_pathToTemp(os.path.join('db', 'sql_default.db'))
+        src = self.get_pathToTemp(['db', 'sql_default.db'])
         dst = os.path.join(userDataDir, 'sql.db')
         if not os.path.exists(userDataDir):
             os.makedirs(userDataDir)
@@ -301,6 +399,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, QCloseEvent):
         self.write_settings()
+        self.chromeDriver.quit()
         self.db.close()
 
     @QtCore.pyqtSlot()
@@ -315,24 +414,59 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.filterWindow.show()
 
     @QtCore.pyqtSlot()
+    def showEditDialog(self):
+        selected = self.get_selectedMatches()
+        if selected == None:
+            return
+        elif len(selected) == 1:
+            self.editDialog = EditDialog(parent=self, selected=selected[0], dbPath=self.dbPath)
+            self.editDialog.show()
+        else:
+            QtWidgets.QMessageBox.warning(self, QtWidgets.qApp.tr("Nur ein Spiel wählen"),
+                                          QtWidgets.qApp.tr("Bitte nur ein Spiel auswhählen.\n\n"
+                                                            "Ok drücken um fortzufahren."),
+                                          QtWidgets.QMessageBox.Ok)
+
+    @QtCore.pyqtSlot()
+    def showGaleryDialog(self):
+        # TODO Multiple upload support
+        selected = self.get_selectedMatches()
+        if selected == None:
+            return
+        elif len(selected) == 1:
+            self.galeryDialog = GaleryDialog(parent=self, cookies=self.get_cookies(), match=selected[0])
+            self.galeryDialog.show()
+        else:
+            QtWidgets.QMessageBox.warning(self, QtWidgets.qApp.tr("Nur ein Spiel wählen"),
+                                          QtWidgets.qApp.tr("Bitte nur ein Spiel auswhählen.\n\n"
+                                                            "Ok drücken um fortzufahren."),
+                                          QtWidgets.QMessageBox.Ok)
+
+    @QtCore.pyqtSlot()
     def date_changed(self):
         date_from = self.dateEdit_3.date()
-        date_to = self.dateEdit_4.date()
 
-        if date_from > date_to:
-            date_to = date_from
-            self.dateEdit_4.setDate(date_to)
-        elif date_to < date_from:
-            date_from = date_to
-            self.dateEdit_3.setDate(date_from)
+        if self.actionZeitraum.isChecked():
+            date_to = self.dateEdit_4.date()
 
-        date_from_str = date_from.toString("yyyy-MM-dd")
-        date_to_str = date_to.addDays(1).toString("yyyy-MM-dd")  # Upper limit exclusive in BETWEEN statement
+            if date_from > date_to:
+                date_to = date_from
+                self.dateEdit_4.setDate(date_to)
+            elif date_to < date_from:
+                date_from = date_to
+                self.dateEdit_3.setDate(date_from)
 
-        self.dateFilterString = 'match_date BETWEEN "%s" AND "%s"' % (date_from_str, date_to_str)
+            date_from_str = date_from.toString("yyyy-MM-dd")
+            date_to_str = date_to.addDays(1).toString("yyyy-MM-dd")  # Upper limit exclusive in BETWEEN statement
+
+            self.dateFilterString = 'match_date BETWEEN "%s" AND "%s"' % (date_from_str, date_to_str)
+        else:
+            date_from_str = date_from.toString("yyyy-MM-dd")
+            self.dateFilterString = 'match_date LIKE "%s%%"' % (date_from_str)
+
         self.sqlmodel_calendar.setFilter(self.get_filterString())
         self.sqlmodel_calendar.select()
-        # self.tableView_2.resizeColumnsToContents()
+        self.tableView.resizeColumnsToContents()
 
     @QtCore.pyqtSlot(str)
     def lineEdit_changed(self, text):
@@ -389,17 +523,57 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         countTeams = 0
 
         if self.selection != []:
-            teamStr = ['home = "%s"' % i.text() for i in self.selection if i.data(QtCore.Qt.UserRole) == region]
+            if region == 'Alle':
+                teams = [i.text() for i in self.selection]
+            else:
+                teams = [i.text() for i in self.selection if i.data(QtCore.Qt.UserRole) == region]
+            teamStr = ['home = "%s"' % i for i in teams]
             teamStr = ' OR '.join(teamStr)
-            countTeams = len(teamStr)
+            countTeams = len(teams)
             if teamStr != '':
                 # no selection in current region found
                 self.matchFilterString = '(' + teamStr + ')'
 
         self.sqlmodel_calendar.setFilter(self.get_filterString())
         self.sqlmodel_calendar.select()
-        # self.tableView_2.resizeColumnsToContents()
-        self.statusBarLabel_1.setText('%s Mannschaften / %s Spiele' % (countTeams, self.sqlmodel_calendar.rowCount()))
+        if self.sqlmodel_calendar.rowCount() > 0:
+            self.tableView.resizeColumnsToContents()
+
+        countMatches = self.sqlmodel_calendar.rowCount()
+        if countMatches == 256:
+            countMatches = '\u221e'
+        self.statusBarLabel_1.setText('%s Mannschaften / %s Spiele' % (countTeams, countMatches))
+
+    @QtCore.pyqtSlot()
+    def datePeriodMenu_changed(self):
+        if self.actionZeitraum.isChecked():
+            # Range
+            self.label_2.setText('Von:')
+            self.label_4.setVisible(True)
+            self.dateEdit_4.setVisible(True)
+
+        elif self.actionZeitpunkt.isChecked():
+            # Day
+            self.label_2.setText('Am:')
+            self.label_4.setVisible(False)
+            self.dateEdit_4.setVisible(False)
+
+        self.date_changed()
+        self.itemSelection_changed()
+
+    @QtCore.pyqtSlot()
+    def viewMenu_changed(self):
+        if self.actionAnsichtSpiele.isChecked():
+            # Show matches
+            self.label_5.setVisible(False)
+            self.label_6.setVisible(False)
+            self.resFilterString = ''
+        elif self.actionAnsichtReservierungen.isChecked():
+            # Show reservations
+            self.label_5.setVisible(True)
+            self.label_6.setVisible(True)
+            self.resFilterString = 'reserved <> 0'
+        self.itemSelection_changed()
 
     @QtCore.pyqtSlot()
     def restoreSelection(self):
@@ -414,8 +588,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def invertSelection(self):
+        region = self.comboBox.currentText()
         for i in range(self.listWidget.count()):
-            if not self.listWidget.item(i).isHidden():
+            itemData = self.listWidget.item(i).data(QtCore.Qt.UserRole)
+            if not self.listWidget.item(i).isHidden() and itemData == region:
                 self.listWidget.setCurrentRow(i, QtCore.QItemSelectionModel.Toggle)
 
     @QtCore.pyqtSlot()
@@ -426,24 +602,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def reserve_match(self):
-        selected = []
-        indexes = self.tableView.selectedIndexes()
-        for index in sorted(indexes):
-            match_id = self.tableView.model().record(index.row()).value('match_id')
-            match_date = self.tableView.model().record(index.row()).value('match_date')
-            home = self.tableView.model().record(index.row()).value('home')
-            guest = self.tableView.model().record(index.row()).value('guest')
-            selected.append({'match_id': match_id, 'match_date': match_date, 'home': home, 'guest': guest})
+        selected = self.get_selectedMatches()
+        cookies = self.get_cookies()
 
-        cookies = self.settings.value('cookie', '')
-        if cookies == '':
-            QtWidgets.QMessageBox.information(self, QtWidgets.qApp.tr("Cookies"),
-                                              QtWidgets.qApp.tr("Keine Cookies vorhanden.\n\n"
-                                                                "Erstelle jetzt deine Cookies in den Einstellungen"),
-                                              QtWidgets.QMessageBox.Ok)
+        if selected == None or cookies == None:
             return
 
         options = {
+            'what': 'reserve',
             'cookie': cookies,
             'selected': selected,
             'database-path': self.dbPath,
@@ -456,6 +622,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.reserveProcess.statusBarSignal.connect(self.statusBar.showMessage)
         self.reserveProcess.alreadyReservedSignal.connect(self.alreadyReservedMessageBox)
         self.reserveProcess.finished.connect(self.sqlmodel_calendar.select)
+        self.reserveProcess.finished.connect(self.tableView.resizeColumnsToContents)
+        self.reserveProcess.updateGuiSignal.connect(self.sqlmodel_calendar.select)
 
         self.reserveProcess.start()
 
@@ -470,10 +638,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     @QtCore.pyqtSlot()
     def download_match(self):
+        date_from = self.dateEdit_3.date()
+        if self.actionZeitraum.isChecked():
+            date_to = self.dateEdit_4.date()
+        else:
+            date_to = date_from
+
         options = {
             'region': self.comboBox.currentText(),
-            'date-from': self.dateEdit_3.date(),
-            'date-to': self.dateEdit_4.date(),
+            'date-from': date_from,
+            'date-to': date_to,
             'database-path': self.dbPath,
             'parent': self
         }
@@ -489,15 +663,100 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         # Connections
         self.downloadProcessor.finished.connect(self.sqlmodel_calendar.select)
-        # self.downloadProcessor.finished.connect(self.tableView_2.resizeColumnsToContents)
+        self.downloadProcessor.finished.connect(self.tableView.resizeColumnsToContents)
         self.downloadProcessor.loggerSignal.connect(self.logDialog.add)
         self.downloadProcessor.statusBarSignal.connect(self.statusBar.showMessage)
 
         self.downloadProcessor.start()
 
+    @QtCore.pyqtSlot()
+    def set_chromeDriver(self):
+        options = {'parent': self}
+        self.chromeDriver = ChromeDriverProcessor(options)
+
+        self.chromeDriver.loggerSignal.connect(self.logDialog.add)
+
+        self.chromeDriver.start()
+
+    @QtCore.pyqtSlot(dict)
+    def set_updateDialog(self, data):
+        if not self.settings.value('updates/skipthisversion/%s' % data['current'], False, bool):  # dont skip
+            if data['latest'] > data['current']:  # silent check
+                data.update({'logo': self.header})
+                self.updateDialog = UpdateDialog(parent=self, data=data)
+                self.updateDialog.show()
+            elif data['active']:  # mannually checked for updates
+                QtWidgets.QMessageBox.information(self, QtWidgets.qApp.tr("Software-Update"),
+                                                  QtWidgets.qApp.tr("Keine Updates gefunden.\n\n"
+                                                                    "FuME ist auf dem neusten Stand!"),
+                                                  QtWidgets.QMessageBox.Ok)
+            else:
+                self.logDialog.add('Auf dem neusten Stand: Version %s' % version)
+
+    @QtCore.pyqtSlot()
+    def checkForUpdates(self, active=True):
+        options = {
+            'version': version,
+            'active': active,
+            'parent': self
+        }
+        self.updateProcessor = UpdateProcessor(options)
+
+        # Connections
+        self.updateProcessor.loggerSignal.connect(self.logDialog.add)
+        self.updateProcessor.statusBarSignal.connect(self.statusBar.showMessage)
+        self.updateProcessor.updateSignal.connect(self.set_updateDialog)
+
+        self.updateProcessor.start()
+
+    @QtCore.pyqtSlot()
+    def deleteReservation(self):
+        selected = self.get_selectedMatches()
+        cookies = self.get_cookies()
+
+        if selected == None or cookies == None:
+            return
+
+        options = {
+            'what': 'delete',
+            'cookie': cookies,
+            'selected': selected,
+            'database-path': self.dbPath,
+            'parent': self
+        }
+        self.reserveProcess = ReserveProcessor(options)
+
+        # Connections
+        self.reserveProcess.loggerSignal.connect(self.logDialog.add)
+        self.reserveProcess.statusBarSignal.connect(self.statusBar.showMessage)
+        self.reserveProcess.alreadyReservedSignal.connect(self.alreadyReservedMessageBox)
+        self.reserveProcess.finished.connect(self.sqlmodel_calendar.select)
+        self.reserveProcess.finished.connect(self.tableView.resizeColumnsToContents)
+        self.reserveProcess.updateGuiSignal.connect(self.sqlmodel_calendar.select)
+
+        self.reserveProcess.start()
+
+    @QtCore.pyqtSlot()
+    def openGameReport(self):
+        selected = self.get_selectedMatches()
+        if selected:
+            for match in selected:
+                webbrowser.open_new_tab('https://www.fupa.net/spielberichte/xxx-xxx-xxx-%d.html' % match['match_id'])
+
 
 def run():
     app = QtWidgets.QApplication(sys.argv)
+
+    # Translates standard-buttons (Ok, Cancel) and mac menu bar to german
+    try:
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+    path = os.path.join(base_path, 'bin', 'qtbase_de.qm')
+    translator = QtCore.QTranslator()
+    translator.load(path)
+    app.installTranslator(translator)
+
     window = MainWindow()
     window.show()
     app.exec_()

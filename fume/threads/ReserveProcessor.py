@@ -1,5 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# --------------------------------------------------------------------------
+# FuME FuPa Match Explorer Copyright (c) 2017 Andreas Feldl <fume@afeldl.de>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# The full license of the GNU General Public License is in the file LICENCE,
+# distributed with this software; if not, see http://www.gnu.org/licenses/.
+# --------------------------------------------------------------------------
 
 import datetime
 import os
@@ -9,26 +26,29 @@ import sys
 import lxml.html
 from PyQt5 import QtCore
 from PyQt5 import QtWidgets
-from selenium import common
 from selenium import webdriver
-from seleniumrequests import Chrome
+from seleniumrequests import Remote
 
 
 class ReserveProcessor(QtCore.QThread):
     loggerSignal = QtCore.pyqtSignal(str)
     statusBarSignal = QtCore.pyqtSignal(str)
     alreadyReservedSignal = QtCore.pyqtSignal(str)
+    updateGuiSignal = QtCore.pyqtSignal()
 
     def __init__(self, options):
         super(ReserveProcessor, self).__init__(options['parent'])
+
+        self.settings = QtCore.QSettings('fume', 'Match-Explorer')
+        self.options = options
 
         self.selected = options['selected']
         self.cookies = options['cookie']
         self.dbPath = options['database-path']
         self.baseUrl = 'https://www.fupa.net/fupa/admin/index.php?page=fotograf_spiele'
 
-    def __del__(self):
-        self.wait()
+    # def __del__(self):
+    #     self.wait()
 
     def reserve(self, match):
         payload = {'match_selected': match['match_id'],
@@ -70,8 +90,24 @@ class ReserveProcessor(QtCore.QThread):
                     # match can be reserved
                     return match, None
 
+    def insertMafoId(self, match):
+        connection = sqlite3.connect(self.dbPath)
+        cursor = connection.cursor()
+
+        selectStr = """SELECT mafo_id FROM calendar WHERE match_id = "{match_id}";"""
+        sql_command = selectStr.format(match_id=match['match_id'])
+        cursor.execute(sql_command)
+
+        mafo_id = cursor.fetchone()[0]
+
+        connection.commit()
+        connection.close()
+
+        match['mafo_id'] = mafo_id
+        return match
+
     def delete(self, match):
-        print('delete', match['mafo_id'])
+        self.loggerSignal.emit('Lösche Reservierung von %s - %s #%s' % (match['home'], match['guest'], match['match_id']))
         self.driver.request("GET", self.baseUrl + '&mafo_id=%s&act=del' % match['mafo_id'])
 
     def markRowAsReserved(self, match, val):
@@ -84,6 +120,7 @@ class ReserveProcessor(QtCore.QThread):
 
         connection.commit()
         connection.close()
+        self.updateGuiSignal.emit()
 
     def get_pathToTemp(self, relative_path):
         try:
@@ -94,24 +131,27 @@ class ReserveProcessor(QtCore.QThread):
         return os.path.join(base_path, relative_path)
 
     def run(self):
+        if self.options['what'] == 'reserve':
+            self.runReserve()
+        elif self.options['what'] == 'delete':
+            self.runDelete()
+
+    def runReserve(self):
         self.statusBarSignal.emit("Reserviere Spiele...")
         counter = 0
 
         options = webdriver.ChromeOptions()
+        if self.settings.value('chrome/headless', True, bool):
+            options.add_argument('--headless')
 
-        # TODO: Umstellung von webdriver.Chrome() auf webdriver.Remote()
         try:
-            sys._MEIPASS
-            # runs as app  - get path to chromedriver in project folder
-            self.driver = Chrome(self.get_pathToTemp('chromedriver'), chrome_options=options)
-        except AttributeError:
-            # runs in terminal - using chromedriver in $PATH
-            self.driver = Chrome(chrome_options=options)
-        except common.exceptions.WebDriverException:
-            # no Chrome found
-            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keinen Treiber gefunden!"),
-                                           QtWidgets.qApp.tr("Kein Google Chrome installiert!\n\n"
-                                                             "Chrome installieren um forzufahren."),
+            self.driver = Remote('http://localhost:9515', desired_capabilities=options.to_capabilities())
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keine Verbindung zu Google Chrome!"),
+                                           QtWidgets.qApp.tr(
+                                               "Es konnte keine Verbindung zu Google Chrome hergestellt werden! "
+                                               "Bitte stelle sicher, dass alle Systemvoraussetzungen erfüllt sind.\n\n"
+                                               "Fehler:\n" + str(e)),
                                            QtWidgets.QMessageBox.Cancel)
             return
 
@@ -126,10 +166,12 @@ class ReserveProcessor(QtCore.QThread):
             try:
                 matchNew, ph = self.reserve(match)
             except Exception as e:
-                self.loggerSignal.emit("Fehler beim reservieren von %s" % match['match_id'])
-                self.driver.close()
-                print(e)
-                return
+                self.loggerSignal.emit("Fehler beim reservieren von %s - %s #%d. "
+                                       "Das Spiel ist nicht mehr in FuPa eingetragen..." % (match['home'], match['guest'], match['match_id']))
+                # TODO mark as not reserved (mafo_id missing)
+                #self.driver.close()
+                print('Fehler:', str(e))
+                continue
             match = matchNew
             if ph != None:
                 alreadyReserved.append([match, ph])
@@ -156,3 +198,34 @@ class ReserveProcessor(QtCore.QThread):
         self.loggerSignal.emit('%s Spiele erfolgreich reserviert' % (counter - len(alreadyReserved)))
         self.loggerSignal.emit('%s davon waren reserviert' % len(alreadyReserved))
         self.statusBarSignal.emit("Bereit")
+
+    def runDelete(self):
+        self.statusBarSignal.emit("Lösche Reservierungen...")
+        options = webdriver.ChromeOptions()
+        if self.settings.value('chrome/headless', True, bool):
+            options.add_argument('--headless')
+
+        try:
+            self.driver = Remote('http://localhost:9515', desired_capabilities=options.to_capabilities())
+        except Exception as e:
+            QtWidgets.QMessageBox.critical(self, QtWidgets.qApp.tr("Keine Verbindung zu Google Chrome!"),
+                                           QtWidgets.qApp.tr(
+                                               "Es konnte keine Verbindung zu Google Chrome hergestellt werden! "
+                                               "Bitte stelle sicher, dass alle Systemvoraussetzungen erfüllt sind.\n\n"
+                                               "Fehler:\n" + str(e)),
+                                           QtWidgets.QMessageBox.Cancel)
+            return
+
+        self.driver.get(self.baseUrl)
+
+        for cookie in self.cookies:
+            self.driver.add_cookie(cookie)
+
+        for match in self.selected:
+            match = self.insertMafoId(match)
+            self.delete(match)
+            self.markRowAsReserved(match, 0)
+
+        self.loggerSignal.emit('%s Reservierungen erfolgreich gelöscht.' % len(self.selected) )
+
+        self.driver.close()

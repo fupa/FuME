@@ -6,227 +6,54 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1457</width>
-    <height>678</height>
+    <width>1200</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>FuME - FuPa Match Explorer</string>
   </property>
-  <property name="unifiedTitleAndToolBarOnMac">
-   <bool>false</bool>
-  </property>
   <widget class="QWidget" name="centralWidget">
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <layout class="QGridLayout" name="gridLayout_3" columnstretch="0,0,0">
-    <property name="leftMargin">
-     <number>12</number>
-    </property>
+   <layout class="QGridLayout" name="gridLayout_3">
     <property name="spacing">
      <number>5</number>
     </property>
-    <item row="3" column="0" colspan="2">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <property name="spacing">
-       <number>-1</number>
-      </property>
-      <property name="leftMargin">
-       <number>1</number>
-      </property>
-      <property name="topMargin">
-       <number>1</number>
-      </property>
-      <property name="rightMargin">
-       <number>1</number>
-      </property>
-      <property name="bottomMargin">
-       <number>1</number>
-      </property>
-      <item>
-       <widget class="QLabel" name="label_11">
-        <property name="text">
-         <string>Suche:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="lineEdit"/>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="checkBox_2">
-        <property name="text">
-         <string>markiert</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="1" column="2" rowspan="7">
-     <widget class="QTableView" name="tableView">
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAsNeeded</enum>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="0">
-     <widget class="QPushButton" name="pushButton_5">
+    <item row="3" column="0">
+     <widget class="QPushButton" name="pushButton">
       <property name="text">
-       <string>importieren</string>
+       <string>Eintrag ändern</string>
       </property>
      </widget>
     </item>
     <item row="2" column="1">
      <widget class="QPushButton" name="pushButton_11">
       <property name="text">
-       <string>reservieren</string>
+       <string>Spiele reservieren</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="0" colspan="2">
-     <widget class="QListWidget" name="listWidget">
-      <property name="minimumSize">
-       <size>
-        <width>350</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>166777</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="selectionMode">
-       <enum>QAbstractItemView::MultiSelection</enum>
-      </property>
-      <item>
-       <property name="text">
-        <string>Noch keine Mannschaften hinzugefügt...</string>
-       </property>
-       <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>Region wählen und unten auf &quot;+&quot; klicken</string>
-       </property>
-       <property name="flags">
-        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
-       </property>
-      </item>
-     </widget>
-    </item>
-    <item row="0" column="0" rowspan="2" colspan="2">
-     <widget class="QLabel" name="label">
+    <item row="2" column="0">
+     <widget class="QPushButton" name="pushButton_5">
       <property name="text">
-       <string/>
-      </property>
-      <property name="pixmap">
-       <pixmap>header_klein.png</pixmap>
+       <string>Spiele importieren</string>
       </property>
      </widget>
     </item>
-    <item row="0" column="2">
-     <widget class="QFrame" name="frame">
-      <property name="maximumSize">
-       <size>
-        <width>16777215</width>
-        <height>40</height>
-       </size>
+    <item row="3" column="1">
+     <widget class="QPushButton" name="pushButton_2">
+      <property name="text">
+       <string>Galerie erstellen</string>
       </property>
-      <layout class="QHBoxLayout" name="horizontalLayout_5">
-       <property name="spacing">
-        <number>-1</number>
-       </property>
-       <property name="leftMargin">
-        <number>0</number>
-       </property>
-       <property name="topMargin">
-        <number>0</number>
-       </property>
-       <property name="rightMargin">
-        <number>0</number>
-       </property>
-       <property name="bottomMargin">
-        <number>0</number>
-       </property>
-       <item>
-        <widget class="QLabel" name="label_13">
-         <property name="text">
-          <string>Region:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QComboBox" name="comboBox"/>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Von:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDateEdit" name="dateEdit_3">
-         <property name="acceptDrops">
-          <bool>false</bool>
-         </property>
-         <property name="calendarPopup">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>Bis:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QDateEdit" name="dateEdit_4">
-         <property name="calendarPopup">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <spacer name="horizontalSpacer_8">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_3">
-         <property name="text">
-          <string>Log</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QPushButton" name="pushButton_4">
-         <property name="text">
-          <string>Einstellungen</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
      </widget>
     </item>
-    <item row="5" column="0" rowspan="3" colspan="2">
+    <item row="1" column="2" rowspan="8">
+     <widget class="QTableView" name="tableView">
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAsNeeded</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0" rowspan="3" colspan="2">
      <widget class="QFrame" name="horizontalFrame">
       <layout class="QHBoxLayout" name="horizontalLayout_2">
        <property name="spacing">
@@ -316,6 +143,190 @@
       </layout>
      </widget>
     </item>
+    <item row="0" column="0" rowspan="2" colspan="2">
+     <widget class="QLabel" name="label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="pixmap">
+       <pixmap>header_klein.png</pixmap>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0" colspan="2">
+     <widget class="QListWidget" name="listWidget">
+      <property name="minimumSize">
+       <size>
+        <width>350</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>166777</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::MultiSelection</enum>
+      </property>
+      <item>
+       <property name="text">
+        <string>Noch keine Mannschaften hinzugefügt...</string>
+       </property>
+       <property name="flags">
+        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Region wählen und unten auf &quot;+&quot; klicken</string>
+       </property>
+       <property name="flags">
+        <set>ItemIsDragEnabled|ItemIsUserCheckable|ItemIsEnabled</set>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QFrame" name="frame">
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>40</height>
+       </size>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout_5">
+       <property name="spacing">
+        <number>-1</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>Region:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QComboBox" name="comboBox"/>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Von:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDateEdit" name="dateEdit_3">
+         <property name="acceptDrops">
+          <bool>false</bool>
+         </property>
+         <property name="calendarPopup">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>Bis:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QDateEdit" name="dateEdit_4">
+         <property name="calendarPopup">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_8">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_6">
+         <property name="text">
+          <string>Reservierung:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; background-color:#b0ea99;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; erfolgreich&lt;br /&gt;&lt;span style=&quot; background-color:#eabdbe;&quot;&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/span&gt; fehlgeschlagen&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item row="4" column="0" colspan="2">
+     <widget class="QWidget" name="searchWidget" native="true">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <property name="spacing">
+        <number>5</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>5</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>5</number>
+       </property>
+       <item>
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Suche:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEdit"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_2">
+         <property name="text">
+          <string>markiert</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusBar">
@@ -323,6 +334,189 @@
     <bool>false</bool>
    </property>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1200</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuDatei">
+    <property name="title">
+     <string>&amp;Datei</string>
+    </property>
+    <addaction name="actionUeber"/>
+    <addaction name="action_ber_QT"/>
+    <addaction name="actionAuf_Update_berpr_fen"/>
+    <addaction name="separator"/>
+    <addaction name="actionEinstellungen"/>
+    <addaction name="separator"/>
+    <addaction name="actionBeenden"/>
+   </widget>
+   <widget class="QMenu" name="menuAnsicht">
+    <property name="title">
+     <string>Ansicht</string>
+    </property>
+    <widget class="QMenu" name="menuDatum">
+     <property name="title">
+      <string>Datum</string>
+     </property>
+     <addaction name="actionHeute"/>
+     <addaction name="separator"/>
+     <addaction name="actionZeitpunkt"/>
+     <addaction name="actionZeitraum"/>
+    </widget>
+    <addaction name="menuDatum"/>
+    <addaction name="separator"/>
+    <addaction name="actionAnsichtSpiele"/>
+    <addaction name="actionAnsichtReservierungen"/>
+    <addaction name="separator"/>
+    <addaction name="actionSpielbericht_anzeigen"/>
+    <addaction name="actionLog"/>
+   </widget>
+   <widget class="QMenu" name="menuBearbeiten">
+    <property name="title">
+     <string>Bearbeiten</string>
+    </property>
+    <addaction name="actionImportieren"/>
+    <addaction name="actionBearbeiten"/>
+    <addaction name="separator"/>
+    <addaction name="actionHinzuf_gen_reservieren"/>
+    <addaction name="actionL_schen"/>
+    <addaction name="separator"/>
+    <addaction name="actionGalerie_hochladen"/>
+   </widget>
+   <addaction name="menuDatei"/>
+   <addaction name="menuBearbeiten"/>
+   <addaction name="menuAnsicht"/>
+  </widget>
+  <action name="actionUeber">
+   <property name="text">
+    <string>Über FuME</string>
+   </property>
+  </action>
+  <action name="actionEinstellungen">
+   <property name="text">
+    <string>Einstellungen</string>
+   </property>
+  </action>
+  <action name="actionLog">
+   <property name="text">
+    <string>Log anzeigen</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
+   </property>
+  </action>
+  <action name="actionZeitpunkt">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Zeitpunkt</string>
+   </property>
+  </action>
+  <action name="actionZeitraum">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Zeitraum</string>
+   </property>
+  </action>
+  <action name="actionHeute">
+   <property name="text">
+    <string>heute</string>
+   </property>
+  </action>
+  <action name="actionBeenden">
+   <property name="text">
+    <string>Beenden</string>
+   </property>
+  </action>
+  <action name="actionAuf_Update_berpr_fen">
+   <property name="text">
+    <string>Auf Updates überprüfen</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::ApplicationSpecificRole</enum>
+   </property>
+  </action>
+  <action name="action_ber_QT">
+   <property name="text">
+    <string>Über QT</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
+   </property>
+  </action>
+  <action name="actionSpiele">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Spiele</string>
+   </property>
+  </action>
+  <action name="actionImportieren">
+   <property name="text">
+    <string>Spiele importieren (aus FuPa)</string>
+   </property>
+  </action>
+  <action name="actionReservierung">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Reservierungen</string>
+   </property>
+  </action>
+  <action name="actionHinzuf_gen_reservieren">
+   <property name="text">
+    <string>Reservierung hinzufügen (reservieren)</string>
+   </property>
+  </action>
+  <action name="actionL_schen">
+   <property name="text">
+    <string>Reservierung löschen</string>
+   </property>
+  </action>
+  <action name="actionAnsichtSpiele">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Spiele</string>
+   </property>
+  </action>
+  <action name="actionAnsichtReservierungen">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Reservierungen</string>
+   </property>
+  </action>
+  <action name="actionBearbeiten">
+   <property name="text">
+    <string>Eintrag bearbeiten</string>
+   </property>
+  </action>
+  <action name="actionGalerie_hochladen">
+   <property name="text">
+    <string>Galerie hochladen</string>
+   </property>
+  </action>
+  <action name="actionSpielbericht_anzeigen">
+   <property name="text">
+    <string>Spielbericht anzeigen</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <resources/>

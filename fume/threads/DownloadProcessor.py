@@ -1,5 +1,22 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# --------------------------------------------------------------------------
+# FuME FuPa Match Explorer Copyright (c) 2017 Andreas Feldl <fume@afeldl.de>
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3 of the License, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# The full license of the GNU General Public License is in the file LICENCE,
+# distributed with this software; if not, see http://www.gnu.org/licenses/.
+# --------------------------------------------------------------------------
 
 import sqlite3
 
@@ -20,8 +37,8 @@ class DownloadProcessor(QtCore.QThread):
         self.date_to = options['date-to']
         self.dbPath = options['database-path']
 
-    def __del__(self):
-        self.wait()
+    # def __del__(self):
+    #     self.wait()
 
     def download(self, date):
         uAStr = 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/41.0.2228.0 Safari/537.36'

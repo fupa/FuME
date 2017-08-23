@@ -1,0 +1,91 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'updatewindow.ui'
+#
+# Created by: PyQt5 UI code generator 5.9
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+class Ui_UpdateWindow(object):
+    def setupUi(self, UpdateWindow):
+        UpdateWindow.setObjectName("UpdateWindow")
+        UpdateWindow.resize(640, 380)
+        UpdateWindow.setMaximumSize(QtCore.QSize(16777215, 600))
+        self.gridLayout_2 = QtWidgets.QGridLayout(UpdateWindow)
+        self.gridLayout_2.setContentsMargins(8, 8, 8, 8)
+        self.gridLayout_2.setObjectName("gridLayout_2")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.newVersionIsAvailableLabel = QtWidgets.QLabel(UpdateWindow)
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.newVersionIsAvailableLabel.setFont(font)
+        self.newVersionIsAvailableLabel.setObjectName("newVersionIsAvailableLabel")
+        self.verticalLayout.addWidget(self.newVersionIsAvailableLabel)
+        self.wouldYouLikeToDownloadLabel = QtWidgets.QLabel(UpdateWindow)
+        self.wouldYouLikeToDownloadLabel.setScaledContents(False)
+        self.wouldYouLikeToDownloadLabel.setWordWrap(True)
+        self.wouldYouLikeToDownloadLabel.setObjectName("wouldYouLikeToDownloadLabel")
+        self.verticalLayout.addWidget(self.wouldYouLikeToDownloadLabel)
+        self.groupBox = QtWidgets.QGroupBox(UpdateWindow)
+        self.groupBox.setMaximumSize(QtCore.QSize(16777215, 300))
+        self.groupBox.setObjectName("groupBox")
+        self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.groupBox)
+        self.horizontalLayout_7.setContentsMargins(5, 5, 5, 5)
+        self.horizontalLayout_7.setObjectName("horizontalLayout_7")
+        self.textEdit = QtWidgets.QTextEdit(self.groupBox)
+        self.textEdit.setReadOnly(True)
+        self.textEdit.setObjectName("textEdit")
+        self.horizontalLayout_7.addWidget(self.textEdit)
+        self.verticalLayout.addWidget(self.groupBox)
+        self.checkBox = QtWidgets.QCheckBox(UpdateWindow)
+        self.checkBox.setObjectName("checkBox")
+        self.verticalLayout.addWidget(self.checkBox)
+        self.horizontalLayout_3 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_3.setObjectName("horizontalLayout_3")
+        self.skipThisVersionButton = QtWidgets.QPushButton(UpdateWindow)
+        self.skipThisVersionButton.setObjectName("skipThisVersionButton")
+        self.horizontalLayout_3.addWidget(self.skipThisVersionButton)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        self.horizontalLayout_3.addItem(spacerItem)
+        self.remindMeLaterButton = QtWidgets.QPushButton(UpdateWindow)
+        self.remindMeLaterButton.setObjectName("remindMeLaterButton")
+        self.horizontalLayout_3.addWidget(self.remindMeLaterButton)
+        self.installUpdateButton = QtWidgets.QPushButton(UpdateWindow)
+        self.installUpdateButton.setAutoDefault(True)
+        self.installUpdateButton.setDefault(True)
+        self.installUpdateButton.setObjectName("installUpdateButton")
+        self.horizontalLayout_3.addWidget(self.installUpdateButton)
+        self.verticalLayout.addLayout(self.horizontalLayout_3)
+        self.gridLayout_2.addLayout(self.verticalLayout, 0, 1, 1, 1)
+        self.label = QtWidgets.QLabel(UpdateWindow)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+        self.label.setMaximumSize(QtCore.QSize(100, 100))
+        self.label.setText("")
+        self.label.setPixmap(QtGui.QPixmap("header_klein.png"))
+        self.label.setObjectName("label")
+        self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1, QtCore.Qt.AlignTop)
+        self.skipThisVersionButton.raise_()
+        self.label.raise_()
+
+        self.retranslateUi(UpdateWindow)
+        QtCore.QMetaObject.connectSlotsByName(UpdateWindow)
+
+    def retranslateUi(self, UpdateWindow):
+        _translate = QtCore.QCoreApplication.translate
+        UpdateWindow.setWindowTitle(_translate("UpdateWindow", "Software-Update"))
+        self.newVersionIsAvailableLabel.setText(_translate("UpdateWindow", "Eine neue Version von FuME ist verfügbar!"))
+        self.wouldYouLikeToDownloadLabel.setText(_translate("UpdateWindow", "FuME %1 ist verfügbar (Du verwendest Version %2). Möchtest du die neue Version jetzt herunterladen?"))
+        self.groupBox.setTitle(_translate("UpdateWindow", "Changelog:"))
+        self.checkBox.setText(_translate("UpdateWindow", "Nicht automatisch nach Updates suchen"))
+        self.skipThisVersionButton.setText(_translate("UpdateWindow", "Diese Version überspringen"))
+        self.remindMeLaterButton.setText(_translate("UpdateWindow", "Später erinnern"))
+        self.installUpdateButton.setText(_translate("UpdateWindow", "Herunterladen"))
+

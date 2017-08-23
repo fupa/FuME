@@ -18,25 +18,15 @@
 # distributed with this software; if not, see http://www.gnu.org/licenses/.
 # --------------------------------------------------------------------------
 
-import datetime
-
 from PyQt5 import QtWidgets
+from PyQt5 import QtGui
 
-from fume.ui.log import Ui_Log
+from fume.ui.about import Ui_Dialog
 
 
-class LogDialog(QtWidgets.QDialog, Ui_Log):
-    def __init__(self, parent=None):
-        super(LogDialog, self).__init__(parent)
+class AboutDialog(QtWidgets.QDialog, Ui_Dialog):
+    def __init__(self, path, version, parent=None):
+        super(AboutDialog, self).__init__(parent)
         self.setupUi(self)
-        self.__counter = 1
-
-    def add(self, text):
-        # if len(text) > 55:
-        #     self.add(text[0:55])
-        #     self.add(text[55:])
-        # else:
-        time = datetime.datetime.now().strftime("%H:%M:%S")
-        self.plainTextEdit.appendPlainText("[%s] %s Uhr: %s" % (self.__counter, time, text))
-        self.parent().statusBar.showMessage("%s" % text)
-        self.__counter += 1
+        self.label.setPixmap(QtGui.QPixmap(path))
+        self.label_3.setText('Version %s' % version)
