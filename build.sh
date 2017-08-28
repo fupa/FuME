@@ -26,7 +26,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")"; pwd)"
 usage() {
 	cat <<EOF
 Usage:
-$(basename "$0") [-h] [-c -d -r -s]
+$(basename "$0") [-h] [-c -d -e -r]
 
 Description:
 Builds FuME with PyInstaller which is located in 'dist' directory.
@@ -38,11 +38,11 @@ Optional switches:
   -d, --build-dmg
     Builds a .dmg with the new FuME.app.
 
+  -e, --build-exe
+    Builds an Installer for Windows
+
   -r, --reset
     Removes Application Support files (e.g. database) and FuMEs setting files, useful for developing
-
-  -s, --build-exe
-    Builds an Installer for Windows
 
 EOF
 }
@@ -70,7 +70,7 @@ build_dmg() {
 
 build_exe() {
     msg_status "Building FuME.exe in 'dist'"
-    "C:\Program Files (x86)\Inno Setup 5\ISCC" build_setup.iss
+    "C:\Program Files (x86)\Inno Setup 5\ISCC" build_exe.iss
     msg_status "Finished building .exe"
 }
 
@@ -108,7 +108,7 @@ while [[ $# -gt 0 ]]; do
         -r|--reset)
         reset=true
         ;;
-        -s|--build-exe)
+        -e|--build-exe)
         exe=true
         ;;
         -h|-?|--help)

@@ -24,6 +24,10 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+resources/
+_site/
+Gemfile
+Gemfile.lock
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -102,3 +106,5 @@ ENV/
 
 .DS_Store
 .idea/
+chromedriver
+chromedriver.exe

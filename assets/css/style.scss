@@ -1,0 +1,28 @@
+---
+---
+
+// Headers
+$header-heading-color: #ffffff;
+$header-bg-color: #3584af;
+$header-bg-color-secondary: #416ca3;
+
+// Text
+$section-headings-color: #464c61;
+$body-text-color: #606c71;
+$body-link-color: #1e6bb8;
+$blockquote-text-color: #819198;
+
+// Breakpoints
+$large-breakpoint: 64em;
+$medium-breakpoint: 42em;
+
+// Code
+$code-bg-color: #f3f6fa;
+$code-text-color: #464c61;
+
+// Borders
+$border-color: #dce6f0;
+$table-border-color: #e9ebec;
+$hr-border-color: #eff0f1;
+
+@import "{{ site.theme }}";
