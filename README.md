@@ -1,3 +1,16 @@
+<img src="bin/header.png" alt="FuME FuPa Match Explorer" width="400">
+
+<!--- [![Requirements Status](https://requires.io/github/fupadev/FuME/requirements.svg?branch=master)](https://requires.io/github/fupadev/FuME/requirements/?branch=master) -->
+[![Github All Releases](https://img.shields.io/github/downloads/fupadev/fume/total.svg)](https://github.com/fupadev/FuME/releases)
+[![GitHub release](https://img.shields.io/github/release/fupadev/fume.svg)](https://github.com/fupadev/FuME/releases/latest)
+![GPL](https://img.shields.io/badge/license-GPL-yellow.svg)
+![Python](https://img.shields.io/badge/python-3.5-blue.svg)
+![PyQt5](https://img.shields.io/badge/pyQt-5.9-green.svg)
+
+_Short description in english:_ FuME is the one and only Match Explorer for the German amateur soccer platform [FuPa.net](https://www.fupa.net/index.php?page=kalender) written in pythons qt module pyqt5 published under LGPLv3 license using requests for public website information and selenium for [Vereinsverwaltung](https://www.fupa.net/fupa/admin/index.php) (password required).
+
+FuME helps photographers speeding up their workflow by **filtering** all on [FuPa Match-Kalender](https://fupa.net/index.php?page=kalender) listed games by team name, match date and location - all adjustable at once! In FuPa you have to reserve every game you want to photograph (time consuming and annoying) - FuME comes with **bulk mode**  to simplify reservation process.
+
 [![FuME Screenshot](bin/screenshot.png)](bin/screenshot.png)
 
 FuME hilft dir beim **Planen**, **Sortieren** und **Reservieren** von Fußballspielen für das Fußballportal [FuPa.net][FuPa],
@@ -81,7 +94,7 @@ Passwort für die [Vereinsverwaltung][Vereinsverwaltung] in die beiden Felder ei
 Viele Funktionen _verstecken_ sich in der Menüleiste unter "Bearbeiten" und "Ansicht", wie zum Beispiel **Reservierungen löschen** oder **Spielberichte anzeigen**.
 
 ## FAQ / Troubleshooting
-<www.fupadev.github.io/fume/#faq--troubleshooting>
+https://fupadev.github.io/FuME/#faq--troubleshooting
 
 ## Bugs / Kontakt
 FuME ist Open Source und wurde von [Andreas Feldl](https://github.com/ndrsfldl) erstellt. Fehler, Bugs oder Wünsche bitte unter [Issues](https://github.com/fupadev/FuME/issues) melden.
