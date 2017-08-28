@@ -76,7 +76,7 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel</set>
+      <set>QDialogButtonBox::Close</set>
      </property>
     </widget>
    </item>
@@ -158,10 +158,10 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="0">
+   <item row="4" column="0" colspan="2">
     <widget class="QCheckBox" name="checkBox">
      <property name="text">
-      <string>nach dem Erstellen im Browser öffnen</string>
+      <string>nach dem Erstellen Spielbericht im Browser anzeigen</string>
      </property>
     </widget>
    </item>

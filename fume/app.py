@@ -331,6 +331,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 home = self.tableView.model().record(index.row()).value('home')
                 guest = self.tableView.model().record(index.row()).value('guest')
                 selected.append({'match_id': match_id, 'match_date': match_date, 'home': home, 'guest': guest})
+
+            # remove dublicates; from https://stackoverflow.com/a/9427216/6304901
+            selected = [dict(t) for t in set([tuple(d.items()) for d in selected])]
+
             return selected
 
     def get_cookies(self):
@@ -621,6 +625,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.reserveProcess.loggerSignal.connect(self.logDialog.add)
         self.reserveProcess.statusBarSignal.connect(self.statusBar.showMessage)
         self.reserveProcess.alreadyReservedSignal.connect(self.alreadyReservedMessageBox)
+        self.reserveProcess.started.connect(lambda: self.pushButton_11.setEnabled(False))
+        self.reserveProcess.finished.connect(lambda: self.pushButton_11.setEnabled(True))
         self.reserveProcess.finished.connect(self.sqlmodel_calendar.select)
         self.reserveProcess.finished.connect(self.tableView.resizeColumnsToContents)
         self.reserveProcess.updateGuiSignal.connect(self.sqlmodel_calendar.select)
@@ -662,6 +668,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.downloadProcessor = DownloadProcessor(options)
 
         # Connections
+        self.downloadProcessor.started.connect(self.pushButton_5.setEnabled(False))
+        self.downloadProcessor.finished.connect(self.pushButton_5.setEnabled(True))
         self.downloadProcessor.finished.connect(self.sqlmodel_calendar.select)
         self.downloadProcessor.finished.connect(self.tableView.resizeColumnsToContents)
         self.downloadProcessor.loggerSignal.connect(self.logDialog.add)
@@ -730,6 +738,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.reserveProcess.loggerSignal.connect(self.logDialog.add)
         self.reserveProcess.statusBarSignal.connect(self.statusBar.showMessage)
         self.reserveProcess.alreadyReservedSignal.connect(self.alreadyReservedMessageBox)
+        self.reserveProcess.started.connect(lambda: self.pushButton_11.setEnabled(False))
+        self.reserveProcess.finished.connect(lambda: self.pushButton_11.setEnabled(True))
         self.reserveProcess.finished.connect(self.sqlmodel_calendar.select)
         self.reserveProcess.finished.connect(self.tableView.resizeColumnsToContents)
         self.reserveProcess.updateGuiSignal.connect(self.sqlmodel_calendar.select)

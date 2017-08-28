@@ -38,7 +38,7 @@ class Ui_Dialog(object):
         self.gridLayout_3.addItem(spacerItem, 1, 0, 1, 1)
         self.buttonBox = QtWidgets.QDialogButtonBox(Dialog)
         self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Close)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout_3.addWidget(self.buttonBox, 5, 0, 1, 1)
         self.groupBox_2 = QtWidgets.QGroupBox(Dialog)
@@ -72,7 +72,7 @@ class Ui_Dialog(object):
         self.gridLayout_3.addWidget(self.groupBox_2, 2, 0, 1, 3)
         self.checkBox = QtWidgets.QCheckBox(Dialog)
         self.checkBox.setObjectName("checkBox")
-        self.gridLayout_3.addWidget(self.checkBox, 4, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.checkBox, 4, 0, 1, 2)
 
         self.retranslateUi(Dialog)
         self.buttonBox.accepted.connect(Dialog.accept)
@@ -90,5 +90,5 @@ class Ui_Dialog(object):
         self.label_2.setText(_translate("Dialog", "Heim:"))
         self.label_4.setText(_translate("Dialog", "Gast:"))
         self.label_6.setText(_translate("Dialog", "ID:"))
-        self.checkBox.setText(_translate("Dialog", "nach dem Erstellen im Browser öffnen"))
+        self.checkBox.setText(_translate("Dialog", "nach dem Erstellen Spielbericht im Browser anzeigen"))
 

@@ -33,6 +33,7 @@ class GaleryDialog(QtWidgets.QDialog, Ui_Dialog):
 
         self.cookies = cookies
         self.match = match
+        self.files = None
 
         self.label_3.setText(self.match['home'])
         self.label_5.setText(self.match['guest'])
@@ -67,6 +68,7 @@ class GaleryDialog(QtWidgets.QDialog, Ui_Dialog):
 
         # Connections
         self.galeryProcessor.finished.connect(self.openGalery)
+        self.galeryProcessor.started.connect(lambda: self.pushButton_2.setEnabled(False))
         self.galeryProcessor.loggerSignal.connect(self.parent().logDialog.add)
         self.galeryProcessor.loggerSignal.connect(self.plainTextEdit.appendPlainText)
         self.galeryProcessor.statusBarSignal.connect(self.parent().statusBar.showMessage)
