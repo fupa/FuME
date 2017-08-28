@@ -668,8 +668,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.downloadProcessor = DownloadProcessor(options)
 
         # Connections
-        self.downloadProcessor.started.connect(self.pushButton_5.setEnabled(False))
-        self.downloadProcessor.finished.connect(self.pushButton_5.setEnabled(True))
+        self.downloadProcessor.started.connect(lambda: self.pushButton_5.setEnabled(False))
+        self.downloadProcessor.finished.connect(lambda: self.pushButton_5.setEnabled(True))
         self.downloadProcessor.finished.connect(self.sqlmodel_calendar.select)
         self.downloadProcessor.finished.connect(self.tableView.resizeColumnsToContents)
         self.downloadProcessor.loggerSignal.connect(self.logDialog.add)
