@@ -1,4 +1,4 @@
-## 1.1 (tba)
+## 1.1 (28.08.2017)
 
 - erstelle mit FuME Galerien auf FuPa
 - verfeinerte Filter durch Einschränktungen nach Zeitpunkt oder Zeitraum
