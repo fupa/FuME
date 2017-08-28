@@ -7,7 +7,9 @@
 ![Python](https://img.shields.io/badge/python-3.5-blue.svg)
 ![PyQt5](https://img.shields.io/badge/pyQt-5.9-green.svg)
 
-_Short description in english:_ FuME is the one and only Match Explorer for the German amateur soccer platform [FuPa.net](https://www.fupa.net/index.php?page=kalender) written in pythons qt module pyqt5 published under LGPLv3 license using requests for public website information and selenium for [Vereinsverwaltung](https://www.fupa.net/fupa/admin/index.php) (password required).
+_Short description in english:_ FuME is the one and only Match Explorer for the German amateur soccer platform [FuPa.net](https://www.fupa.net/index.php?page=kalender)
+written in python and PyQt5 and published under [GNU GPLv3](http://www.gnu.org/licenses/) license using requests for public website information
+and selenium for [Vereinsverwaltung][Vereinsverwaltung] (password required).
 
 FuME helps photographers speeding up their workflow by **filtering** all on [FuPa Match-Kalender](https://fupa.net/index.php?page=kalender) listed games by team name, match date and location - all adjustable at once! In FuPa you have to reserve every game you want to photograph (time consuming and annoying) - FuME comes with **bulk mode**  to simplify reservation process.
 
@@ -115,6 +117,7 @@ Dieses Projekt verwendet die [GNU GPLv3](http://www.gnu.org/licenses/) Lizenz ge
 
 Basic Logo made by [Freepik](http://www.freepik.com/) from [www.flaticon.com](http://www.flaticon.com)
 and Command Link Button Icons by <a href="http://www.flaticon.com/authors/google" title="Google">Google</a> from <a href="http://www.flaticon.com" title="Flaticon">www.flaticon.com</a> is licensed by <a href="http://creativecommons.org/licenses/by/3.0/" title="Creative Commons BY 3.0" target="_blank">CC 3.0 BY</a>
+
 [download_url_windows]: https://github.com/fupadev/FuME/releases
 [download_url_mac]: https://github.com/fupadev/FuME/releases
 [Chrome]: https://www.google.com/chrome/browser/desktop/index.html
