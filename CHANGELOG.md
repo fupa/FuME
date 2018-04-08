@@ -2,7 +2,7 @@ ACHTUNG: FuPa prüft nun intern, ob Spiele außerhalb des 14-Tage-Zeitraums
 reserviert werden sollen und verhindert diese. FuME kann diese Beschränkung
 nun nicht mehr umgehen.
 
-## 1.2 (tba)
+## 1.2 (08.04.2018)
 
 - neue Shortcuts
 - neue Buttons in Zeitpunkt-Ansicht
