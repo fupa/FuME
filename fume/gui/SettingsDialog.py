@@ -20,6 +20,7 @@
 
 import os
 import shutil
+import subprocess
 import sys
 import time
 
@@ -43,6 +44,11 @@ class SettingsDialog(QtWidgets.QDialog, Ui_Settings):
         self.settings = QtCore.QSettings('fume', 'Match-Explorer')
 
         self.checkBox.setChecked(self.settings.value('chrome/headless', True, bool))
+
+        # Stats
+        chromedriver_ver = subprocess.run([self.get_pathToTemp('chromedriver'), '--version'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+        chromedriver_ver_pretty = chromedriver_ver.split(' ')[1]
+        self.label_4.setText('ChromeDriver Version ' + chromedriver_ver_pretty)
 
         # Connections
         self.pushButton.clicked.connect(self.createCookie)

@@ -246,6 +246,20 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="pushButton_3">
+         <property name="text">
+          <string>- </string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_4">
+         <property name="text">
+          <string>+</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QLabel" name="label_4">
          <property name="text">
           <string>Bis:</string>
@@ -352,6 +366,8 @@
     <addaction name="actionAuf_Update_berpr_fen"/>
     <addaction name="separator"/>
     <addaction name="actionEinstellungen"/>
+    <addaction name="separator"/>
+    <addaction name="actionDrucken"/>
     <addaction name="separator"/>
     <addaction name="actionBeenden"/>
    </widget>
@@ -464,6 +480,9 @@
    <property name="text">
     <string>Spiele importieren (aus FuPa)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
   </action>
   <action name="actionReservierung">
    <property name="enabled">
@@ -477,10 +496,16 @@
    <property name="text">
     <string>Reservierung hinzufügen (reservieren)</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
   </action>
   <action name="actionL_schen">
    <property name="text">
     <string>Reservierung löschen</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
    </property>
   </action>
   <action name="actionAnsichtSpiele">
@@ -506,15 +531,32 @@
    <property name="text">
     <string>Eintrag bearbeiten</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
   </action>
   <action name="actionGalerie_hochladen">
    <property name="text">
     <string>Galerie hochladen</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
+   </property>
   </action>
   <action name="actionSpielbericht_anzeigen">
    <property name="text">
     <string>Spielbericht anzeigen</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+I</string>
+   </property>
+  </action>
+  <action name="actionDrucken">
+   <property name="text">
+    <string>Drucken</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
    </property>
   </action>
  </widget>

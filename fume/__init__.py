@@ -14,3 +14,4 @@
 # The full license of the GNU General Public License is in the file LICENCE,
 # distributed with this software; if not, see http://www.gnu.org/licenses/.
 # --------------------------------------------------------------------------
+version = '1.2'

@@ -25,11 +25,13 @@ import sys
 import webbrowser
 
 import appdirs
+import xlsxwriter
 from PyQt5 import QtCore
 from PyQt5 import QtGui
 from PyQt5 import QtSql
 from PyQt5 import QtWidgets
 
+from fume import version
 from fume.gui.AboutDialog import AboutDialog
 from fume.gui.AboutQtDialog import AboutQtDialog
 from fume.gui.EditDialog import EditDialog
@@ -44,8 +46,6 @@ from fume.threads.ReserveProcessor import ReserveProcessor
 from fume.threads.UpdateProcessor import UpdateProcessor
 from fume.ui.mainwindow import Ui_MainWindow
 
-version = '1.1'
-
 
 class CustomSqlModel(QtSql.QSqlQueryModel):
     # adapted: https://stackoverflow.com/a/44104745
@@ -57,7 +57,7 @@ class CustomSqlModel(QtSql.QSqlQueryModel):
     def data(self, item, role):
         # Changing color if "reserved" is True
         if role == QtCore.Qt.BackgroundRole:
-            if item.row() % 2: # alternating background color
+            if item.row() % 2:  # alternating background color
                 # dark
                 if QtSql.QSqlQueryModel.data(self, self.index(item.row(), 7), QtCore.Qt.DisplayRole) == 1:
                     return QtGui.QBrush(QtGui.QColor.fromRgb(176, 234, 153))
@@ -85,7 +85,7 @@ class CustomSqlModel(QtSql.QSqlQueryModel):
     #     return True
 
     def flags(self, index):
-        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable #| QtCore.Qt.ItemIsEditable
+        return QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable  # | QtCore.Qt.ItemIsEditable
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
@@ -166,6 +166,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         self.actionGalerie_hochladen.triggered.connect(self.showGaleryDialog)
         self.actionBearbeiten.triggered.connect(self.showEditDialog)
         self.actionSpielbericht_anzeigen.triggered.connect(self.openGameReport)
+        self.actionDrucken.triggered.connect(self.print)
 
         dateRangeGroup = QtWidgets.QActionGroup(self)
         dateRangeGroup.addAction(self.actionZeitpunkt)
@@ -181,6 +182,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         # Push Buttons
         self.pushButton.clicked.connect(self.showEditDialog)
         self.pushButton_2.clicked.connect(self.showGaleryDialog)
+        self.pushButton_3.clicked.connect(lambda: self.dateEdit_3.setDate(self.dateEdit_3.date().addDays(-1)))
+        self.pushButton_4.clicked.connect(lambda: self.dateEdit_3.setDate(self.dateEdit_3.date().addDays(1)))
         self.pushButton_5.clicked.connect(self.download_match)
         self.pushButton_11.clicked.connect(self.reserve_match)
 
@@ -403,7 +406,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, QCloseEvent):
         self.write_settings()
-        self.chromeDriver.quit()
+        try:
+            self.chromeDriver.quit()
+        except ProcessLookupError:
+            pass
         self.db.close()
 
     @QtCore.pyqtSlot()
@@ -555,12 +561,16 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             self.label_2.setText('Von:')
             self.label_4.setVisible(True)
             self.dateEdit_4.setVisible(True)
+            self.pushButton_3.setVisible(False)
+            self.pushButton_4.setVisible(False)
 
         elif self.actionZeitpunkt.isChecked():
             # Day
             self.label_2.setText('Am:')
             self.label_4.setVisible(False)
             self.dateEdit_4.setVisible(False)
+            self.pushButton_3.setVisible(True)
+            self.pushButton_4.setVisible(True)
 
         self.date_changed()
         self.itemSelection_changed()
@@ -752,6 +762,44 @@ class MainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         if selected:
             for match in selected:
                 webbrowser.open_new_tab('https://www.fupa.net/spielberichte/xxx-xxx-xxx-%d.html' % match['match_id'])
+
+    @QtCore.pyqtSlot()
+    def print(self):
+        now = self.dateEdit_3.date().toString('dd-MM-yyyy')
+
+        fileName, _ = QtWidgets.QFileDialog.getSaveFileName(self, "Dateiname (*.xlsx)", now, ".xlsx(*.xlsx)")
+
+        if fileName:
+            workbook = xlsxwriter.Workbook(fileName)
+            worksheet = workbook.add_worksheet()
+
+            headerFormat = workbook.add_format({'bold': True, 'bottom': 2, 'border': 1})
+            contentFormat = workbook.add_format({'border': 1})
+            contentFormatAlternate = workbook.add_format({'border': 1, 'bg_color': '#EFEFF1'})
+
+            # write header
+            for currentColumn in range(self.tableView.model().columnCount()):
+                if not self.tableView.isColumnHidden(currentColumn):
+                    header = self.tableView.model().headerData(currentColumn, QtCore.Qt.Horizontal)
+                    worksheet.write(0, currentColumn, header, headerFormat)
+
+            # write content and adjust column width
+            width = 0  # default
+            for currentColumn in range(self.tableView.model().columnCount()):
+                if not self.tableView.isColumnHidden(currentColumn):
+                    for currentRow in range(self.tableView.model().rowCount()):
+                        value = self.tableView.model().record(currentRow).value(currentColumn)
+                        if currentRow % 2:
+                            format = contentFormat
+                        else:
+                            format = contentFormatAlternate
+                        worksheet.write(currentRow + 1, currentColumn, value, format)
+                        currentWidth = len(str(value))
+                        if currentWidth > width: width = currentWidth
+                    worksheet.set_column(currentColumn, currentColumn, width * 1.1)
+                    width = 0
+
+            workbook.close()
 
 
 def run():

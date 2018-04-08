@@ -24,7 +24,7 @@ Jeder. Das Projekt ist Open Source, unter [GNU GPLv3](http://www.gnu.org/license
 - reserviere **mehrere Begegnungen innerhalb weniger Sekunden** (siehe [gif](#noch-nicht-überzeugt))
 - erstelle **Galerien mit nur einem klick**
 - **multiregionaler** Support
-- reserviere **vor allen anderen** (keine 14 Tage Begrenzung, siehe [unten](#faq--troubleshooting))
+- ~~reserviere **vor allen anderen** (keine 14 Tage Begrenzung, siehe [unten](#faq--troubleshooting))~
 - _und vieles mehr!_
 
 ## Noch nicht überzeugt?
@@ -104,8 +104,8 @@ Viele Funktionen _verstecken_ sich in der Menüleiste unter "Bearbeiten" und "An
 
  > Wie reserviere ich eine ganze Saison meiner Mannschaft?
 
- Da FuME keine zeitliche Beschränkung kennt (so wie 'geplante Spiele' in der Vereinsverwaltung, 14 Tage) kannst du jedes Datum
- deiner Mannschaft (Heimspiele) auswählen - z.B. jeden zweiten Sonntag - und dieses Spiel wie gewohnt reservieren. Dies wird aber ab der nächsten Version automatisiert funktionieren.
+ ~~Da FuME keine zeitliche Beschränkung kennt (so wie 'geplante Spiele' in der Vereinsverwaltung, 14 Tage) kannst du jedes Datum
+ deiner Mannschaft (Heimspiele) auswählen - z.B. jeden zweiten Sonntag - und dieses Spiel wie gewohnt reservieren. Dies wird aber ab der nächsten Version automatisiert funktionieren.~~
 
  > Wie kann ich FuME deinstallieren/löschen?
 
@@ -130,9 +130,8 @@ sudo spctl --master-enable
 ```
 
 ## Todos
- - [ ] Saison-Reservierungen
  - [ ] Filter nach Auswärtsspielen
- - [ ] Übersicht Drucken
+ - [x] Übersicht Drucken
  - [x] Reservierungsübersicht
  - [x] MacOS Dmg
  - [x] Windows Installer
@@ -149,7 +148,7 @@ cd fume
 python3 install -r requirements.txt
 python3 main.py
 ```
-Nimm Änderungen an den Dateien vor, z.B. am Main-Script ``/fume/main.app``.
+Nimm Änderungen an den Dateien vor, z.B. am Main-Script ``/fume/app.py``.
 
 ## Lizenz / Credit
 Dieses Projekt verwendet die [GNU GPLv3](http://www.gnu.org/licenses/) Lizenz gemäß PyQt, siehe [Riverbank Computing](https://www.riverbankcomputing.com/commercial/pyqt)

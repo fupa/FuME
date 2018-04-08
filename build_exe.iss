@@ -21,7 +21,7 @@
 ; Constants: http://www.jrsoftware.org/ishelp/index.php?topic=consts
 
 #define MyAppName "FuME"
-#define MyAppVersion "1.1"
+; #define MyAppVersion "1.2" ; is set by build.sh
 #define MyAppPublisher "Andreas Feldl"
 #define MyAppURL "https://fupadev.github.io/FuME/"
 #define MyAppExeName "FuME.exe"

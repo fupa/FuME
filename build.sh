@@ -56,7 +56,9 @@ msg_error() {
 
 build() {
     msg_status "Building FuME with PyInstaller"
-    pyinstaller -y --log-level=WARN main.spec
+    python -c 'from fume import version; print("version = \"%s\""%version)' | cat - main.spec > temp && mv temp main_temp.spec
+    pyinstaller -y --log-level=WARN main_temp.spec
+    rm main_temp.spec
     msg_status "Finished building"
 }
 
@@ -70,8 +72,10 @@ build_dmg() {
 
 build_exe() {
     msg_status "Building FuME.exe in 'dist'"
-    "C:\Program Files (x86)\Inno Setup 5\ISCC" build_exe.iss
+    python -c 'from fume import version; print("#define MyAppVersion \"'%s'\"" %version)' | cat - build_exe.iss > temp && mv temp build_exe_temp.iss
+    "C:\Program Files (x86)\Inno Setup 5\ISCC" build_exe_temp.iss
     msg_status "Finished building .exe"
+    rm build_exe_temp.iss
 }
 
 cleanup() {

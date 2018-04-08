@@ -1,3 +1,16 @@
+ACHTUNG: FuPa prüft nun intern, ob Spiele außerhalb des 14-Tage-Zeitraums
+reserviert werden sollen und verhindert diese. FuME kann diese Beschränkung
+nun nicht mehr umgehen.
+
+## 1.2 (tba)
+
+- neue Shortcuts
+- neue Buttons in Zeitpunkt-Ansicht
+- Tabelle drucken (export als .xlsx)
+- chromedriver: Update auf Version 2.36
+- Bug-Fix:
+    - Absturz beim beenden mit bereits laufendem Chrome-Driver behoben
+
 ## 1.1 (28.08.2017)
 
 - erstelle mit FuME Galerien auf FuPa

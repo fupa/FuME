@@ -35,7 +35,7 @@ from sys import platform
 
 os = None
 name = 'FuME'
-version = '1.1'
+#version = '1.2' # is set by build.sh
 debug = False
 console = False
 excludes = []

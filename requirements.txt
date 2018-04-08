@@ -12,3 +12,4 @@ sip==4.19.3
 six==1.10.0
 tldextract==2.1.0
 urllib3==1.22
+XlsxWriter==0.9.8

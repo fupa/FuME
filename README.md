@@ -36,7 +36,7 @@ Jeder. Das Projekt ist Open Source, unter [GNU GPLv3](http://www.gnu.org/license
 - reserviere **mehrere Begegnungen innerhalb weniger Sekunden** (siehe [gif](#noch-nicht-überzeugt))
 - erstelle **Galerien mit nur einem klick**
 - **multiregionaler** Support
-- reserviere **vor allen anderen** (keine 14 Tage Begrenzung, siehe [unten](#faq--troubleshooting))
+- ~~reserviere **vor allen anderen** (keine 14 Tage Begrenzung, siehe [unten](#faq--troubleshooting))~~
 - _und vieles mehr!_
 
 ## Noch nicht überzeugt?
@@ -110,7 +110,7 @@ cd fume
 python3 install -r requirements.txt
 python3 main.py
 ```
-Nimm Änderungen an den Dateien vor, z.B. am Main-Script ``/fume/main.app``.
+Nimm Änderungen an den Dateien vor, z.B. am Main-Script ``/fume/app.py``.
 
 ## Lizenz / Credit
 Dieses Projekt verwendet die [GNU GPLv3](http://www.gnu.org/licenses/) Lizenz gemäß PyQt, siehe [Riverbank Computing](https://www.riverbankcomputing.com/commercial/pyqt)
